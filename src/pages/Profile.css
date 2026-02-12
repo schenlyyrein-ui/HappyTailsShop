@@ -1,0 +1,1713 @@
+/* Profile.css - Happy Tails Profile Page */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --pink-primary: #f53799;
+  --pink-light: #fff2fa;
+  --pink-hover: #d42a7d;
+  --pink-soft: #fff9fb;
+  --blue-primary: #3ae4fa;
+  --blue-soft: #e6faff;
+  --green-success: #4caf50;
+  --green-light: #e8f5e9;
+  --orange-warning: #ff9800;
+  --orange-light: #fff3e0;
+  --red-error: #f44336;
+  --red-light: #ffebee;
+  --gray-50: #f9f9f9;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-400: #bdbdbd;
+  --gray-500: #9e9e9e;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --white: #ffffff;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-pink: 0 4px 12px rgba(245, 55, 153, 0.15);
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.profile-page {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--gray-50);
+  min-height: 100vh;
+  width: 100%;
+}
+
+.profile-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px 60px;
+}
+
+/* ========== HEADER NAVIGATION ========== */
+.profile-header-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--gray-200);
+  background-color: var(--white);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-left {
+  flex: 0 0 auto;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.nav-logo-happy {
+  color: var(--pink-primary);
+}
+
+.nav-logo-tails {
+  color: var(--blue-primary);
+}
+
+.nav-center {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+.nav-link {
+  color: var(--gray-700);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  transition: color 0.2s ease;
+  padding: 8px 0;
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--pink-primary);
+}
+
+.nav-link.active {
+  color: var(--pink-primary);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--pink-primary);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+/* Notifications */
+.notifications-dropdown {
+  position: relative;
+}
+
+.notifications-icon {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  position: relative;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.notifications-icon:hover {
+  background-color: var(--pink-soft);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--pink-primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notifications-panel {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 380px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-200);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.notifications-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin: 0;
+}
+
+.mark-all-read {
+  background: none;
+  border: none;
+  color: var(--pink-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.mark-all-read:hover {
+  background-color: var(--pink-soft);
+  color: var(--pink-hover);
+}
+
+.notifications-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  gap: 15px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.notification-item:hover {
+  background-color: var(--pink-soft);
+}
+
+.notification-item.unread {
+  background-color: var(--pink-soft);
+  border-left: 3px solid var(--pink-primary);
+}
+
+.notification-icon {
+  font-size: 20px;
+  min-width: 32px;
+  height: 32px;
+  background-color: var(--gray-100);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--gray-800);
+  margin-bottom: 4px;
+}
+
+.notification-message {
+  font-size: 13px;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+
+/* User Profile Badge */
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background-color: var(--pink-soft);
+  border-radius: 40px;
+  border: 1px solid var(--pink-primary);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--pink-primary);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--pink-primary);
+  padding-right: 8px;
+}
+
+/* ========== WELCOME BANNER ========== */
+.welcome-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--pink-soft) 0%, #fff5fa 100%);
+  padding: 40px;
+  border-radius: var(--border-radius-xl);
+  margin-bottom: 40px;
+  border: 1px solid rgba(245, 55, 153, 0.1);
+}
+
+.welcome-text h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--gray-800);
+  margin-bottom: 10px;
+}
+
+.welcome-text p {
+  font-size: 18px;
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+.pet-avatars {
+  display: flex;
+  gap: 20px;
+}
+
+.pet-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.pet-avatar span:first-child {
+  font-size: 32px;
+  background-color: var(--white);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-pink);
+  border: 2px solid var(--pink-primary);
+}
+
+.pet-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pink-primary);
+}
+
+/* ========== STATS CARDS ========== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, var(--white) 0%, var(--pink-soft) 100%);
+  padding: 25px;
+  border-radius: var(--border-radius-lg);
+  text-align: center;
+  border: 1px solid rgba(245, 55, 153, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-pink);
+  border-color: var(--pink-primary);
+}
+
+.stat-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.stat-number {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--pink-primary);
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-600);
+}
+
+/* ========== TABS NAVIGATION ========== */
+.profile-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid var(--gray-200);
+  padding-bottom: 15px;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: var(--border-radius-md);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--pink-primary);
+  background-color: var(--pink-soft);
+}
+
+.tab-btn.active {
+  color: var(--white);
+  background-color: var(--pink-primary);
+  box-shadow: var(--shadow-pink);
+}
+
+/* ========== SECTION HEADERS ========== */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+.view-all {
+  background: none;
+  border: none;
+  color: var(--pink-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.view-all:hover {
+  background-color: var(--pink-soft);
+  color: var(--pink-hover);
+}
+
+/* ========== BOOKING CARDS ========== */
+.booking-card-preview {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 15px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  transition: all 0.2s ease;
+}
+
+.booking-card-preview:hover {
+  box-shadow: var(--shadow-pink);
+  border-color: var(--pink-primary);
+}
+
+.booking-service-icon {
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  background-color: var(--pink-soft);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pink-primary);
+}
+
+.booking-details h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 6px;
+}
+
+.booking-pet {
+  font-size: 14px;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+
+.booking-datetime {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.confirmed {
+  background-color: var(--green-light);
+  color: var(--green-success);
+  border: 1px solid var(--green-success);
+}
+
+.status-badge.completed {
+  background-color: var(--gray-200);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-400);
+}
+
+.status-badge.pending {
+  background-color: var(--orange-light);
+  color: var(--orange-warning);
+  border: 1px solid var(--orange-warning);
+}
+
+/* Full Booking Card */
+.booking-card-full {
+  display: flex;
+  gap: 30px;
+  padding: 30px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 25px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-200);
+  transition: all 0.3s ease;
+}
+
+.booking-card-full:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--pink-primary);
+}
+
+.booking-image {
+  flex: 0 0 100px;
+}
+
+.pet-placeholder {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, var(--pink-primary), var(--blue-primary));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 800;
+  color: white;
+  text-transform: uppercase;
+}
+
+.booking-content {
+  flex: 1;
+}
+
+.booking-service-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.booking-service-header h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--gray-800);
+}
+
+.booking-pet-info {
+  font-size: 16px;
+  color: var(--gray-600);
+  margin-bottom: 12px;
+}
+
+.booking-pet-info .pet-name {
+  font-weight: 700;
+  color: var(--pink-primary);
+}
+
+.booking-datetime {
+  font-size: 15px;
+  color: var(--gray-700);
+  margin-bottom: 12px;
+}
+
+.booking-datetime .time {
+  margin-left: 15px;
+}
+
+.booking-price {
+  margin-bottom: 8px;
+}
+
+.price-label {
+  font-size: 14px;
+  color: var(--gray-500);
+  margin-right: 8px;
+}
+
+.price-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--pink-primary);
+}
+
+.booking-note {
+  font-size: 12px;
+  color: var(--gray-500);
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-reschedule, .btn-cancel {
+  padding: 12px 24px;
+  border-radius: var(--border-radius-md);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-reschedule {
+  background-color: var(--pink-primary);
+  color: white;
+}
+
+.btn-reschedule:hover {
+  background-color: var(--pink-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-pink);
+}
+
+.btn-cancel {
+  background-color: var(--white);
+  color: var(--red-error);
+  border: 2px solid var(--red-error);
+}
+
+.btn-cancel:hover {
+  background-color: var(--red-light);
+  transform: translateY(-2px);
+}
+
+/* ========== ORDERS ========== */
+.order-card-preview {
+  padding: 16px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 12px;
+  border: 1px solid var(--gray-200);
+}
+
+.order-id {
+  font-weight: 700;
+  color: var(--pink-primary);
+  margin-bottom: 6px;
+}
+
+.order-date {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 6px;
+}
+
+.order-items {
+  font-size: 13px;
+  color: var(--gray-700);
+  margin-bottom: 8px;
+}
+
+.order-total {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 8px;
+}
+
+.order-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.order-status.completed {
+  background-color: var(--green-light);
+  color: var(--green-success);
+}
+
+.order-status.processing {
+  background-color: var(--orange-light);
+  color: var(--orange-warning);
+}
+
+/* Full Order Card */
+.order-card-full {
+  padding: 25px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 20px;
+  border: 1px solid var(--gray-200);
+  transition: all 0.2s ease;
+}
+
+.order-card-full:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--pink-primary);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.order-id-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-id-label {
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+.order-id-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pink-primary);
+}
+
+.order-date-full {
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+.order-status-badge {
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.order-status-badge.completed {
+  background-color: var(--green-light);
+  color: var(--green-success);
+}
+
+.order-status-badge.processing {
+  background-color: var(--orange-light);
+  color: var(--orange-warning);
+}
+
+.order-items-list {
+  margin-bottom: 20px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--gray-200);
+}
+
+.item-name {
+  font-size: 15px;
+  color: var(--gray-700);
+}
+
+.item-quantity {
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.order-total-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.total-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.total-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--pink-primary);
+}
+
+.payment-badge {
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.payment-badge.paid {
+  background-color: var(--green-light);
+  color: var(--green-success);
+}
+
+.payment-badge.pending {
+  background-color: var(--orange-light);
+  color: var(--orange-warning);
+}
+
+.btn-view-details {
+  background: none;
+  border: none;
+  color: var(--pink-primary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-view-details:hover {
+  background-color: var(--pink-soft);
+  color: var(--pink-hover);
+}
+
+/* ========== REVIEWS ========== */
+.review-preview-card {
+  padding: 20px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 15px;
+  border: 1px solid var(--gray-200);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.review-service {
+  font-weight: 700;
+  color: var(--pink-primary);
+}
+
+.review-rating {
+  color: #ffc107;
+  font-size: 14px;
+}
+
+.review-pet {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 12px;
+}
+
+.review-comment {
+  font-size: 14px;
+  color: var(--gray-700);
+  line-height: 1.6;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.edit-review-btn {
+  background: none;
+  border: 1px solid var(--pink-primary);
+  color: var(--pink-primary);
+  padding: 8px 16px;
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-review-btn:hover {
+  background-color: var(--pink-primary);
+  color: white;
+}
+
+/* Full Review Card */
+.review-card-full {
+  padding: 30px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 25px;
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.review-card-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 8px;
+}
+
+.review-meta {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.review-pet, .review-date {
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+.review-rating-display {
+  color: #ffc107;
+  font-size: 16px;
+}
+
+.review-comment-full {
+  font-size: 16px;
+  color: var(--gray-700);
+  line-height: 1.7;
+  margin-bottom: 25px;
+  padding: 20px;
+  background-color: var(--gray-50);
+  border-radius: var(--border-radius-md);
+  border-left: 4px solid var(--pink-primary);
+  font-style: italic;
+}
+
+.review-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.btn-edit-review {
+  padding: 10px 20px;
+  background: none;
+  border: 2px solid var(--pink-primary);
+  color: var(--pink-primary);
+  border-radius: var(--border-radius-md);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-review:hover {
+  background-color: var(--pink-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-delete-review {
+  padding: 10px 20px;
+  background: none;
+  border: 2px solid var(--red-error);
+  color: var(--red-error);
+  border-radius: var(--border-radius-md);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-review:hover {
+  background-color: var(--red-error);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ========== REVIEW FORM ========== */
+.review-form-container {
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--pink-primary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.review-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.review-form-header h3 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--pink-primary);
+}
+
+.btn-close-form {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--gray-500);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.btn-close-form:hover {
+  background-color: var(--gray-100);
+  color: var(--pink-primary);
+}
+
+.review-service-info {
+  font-size: 16px;
+  color: var(--gray-600);
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.rating-selector {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.stars-container {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.star {
+  font-size: 36px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--gray-300);
+}
+
+.star.active {
+  color: #ffc107;
+  transform: scale(1.2);
+}
+
+.star:hover {
+  transform: scale(1.3);
+  color: #ffc107;
+}
+
+.rating-text {
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.optional {
+  font-size: 12px;
+  color: var(--gray-500);
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--border-radius-md);
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
+  resize: vertical;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--pink-primary);
+  box-shadow: 0 0 0 3px rgba(245, 55, 153, 0.1);
+}
+
+.btn-submit-review {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--pink-primary), var(--pink-hover));
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-submit-review:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-pink);
+}
+
+/* ========== PAST BOOKINGS ========== */
+.past-booking-card {
+  padding: 25px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 20px;
+  border: 1px solid var(--gray-200);
+}
+
+.past-booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.past-booking-service h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 6px;
+}
+
+.booking-date {
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+.past-booking-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.pet-info .pet-name {
+  font-weight: 700;
+  color: var(--pink-primary);
+}
+
+.pet-info .pet-breed {
+  font-size: 14px;
+  color: var(--gray-500);
+  margin-left: 8px;
+}
+
+.booking-price-paid .price-label {
+  font-size: 14px;
+  color: var(--gray-500);
+  margin-right: 8px;
+}
+
+.booking-price-paid .price-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--pink-primary);
+}
+
+.past-booking-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rating-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-text {
+  font-size: 14px;
+  color: var(--gray-600);
+}
+
+.past-booking-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-book-again {
+  padding: 10px 20px;
+  background: none;
+  border: 2px solid var(--pink-primary);
+  color: var(--pink-primary);
+  border-radius: var(--border-radius-md);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-book-again:hover {
+  background-color: var(--pink-primary);
+  color: white;
+}
+
+.btn-leave-review {
+  padding: 10px 20px;
+  background: none;
+  border: 2px solid var(--blue-primary);
+  color: var(--blue-primary);
+  border-radius: var(--border-radius-md);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-leave-review:hover {
+  background-color: var(--blue-primary);
+  color: white;
+}
+
+/* ========== COMMUNITY TAB ========== */
+.community-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.community-stat-card {
+  background: linear-gradient(135deg, var(--white) 0%, var(--pink-soft) 100%);
+  padding: 30px;
+  border-radius: var(--border-radius-lg);
+  text-align: center;
+  border: 1px solid rgba(245, 55, 153, 0.1);
+  transition: all 0.3s ease;
+}
+
+.community-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-pink);
+}
+
+.community-stat-card.main {
+  background: linear-gradient(135deg, var(--pink-primary), var(--pink-hover));
+  color: white;
+}
+
+.community-stat-card.main .average-rating-large {
+  font-size: 64px;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.community-stat-card.main .rating-stars {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.community-stat-card.main .rating-label {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.community-stat-card.main .review-count {
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+.stat-number-large {
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--pink-primary);
+  margin-bottom: 10px;
+}
+
+.stat-icon {
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.stat-sub {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-top: 8px;
+}
+
+/* Reviews by Service */
+.reviews-by-service {
+  margin-bottom: 40px;
+}
+
+.reviews-by-service h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 20px;
+}
+
+.service-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.service-filter-btn {
+  padding: 10px 20px;
+  background: none;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--border-radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.service-filter-btn:hover {
+  border-color: var(--pink-primary);
+  color: var(--pink-primary);
+  background-color: var(--pink-soft);
+}
+
+.service-filter-btn.active {
+  background-color: var(--pink-primary);
+  color: white;
+  border-color: var(--pink-primary);
+}
+
+/* Community Review Card */
+.community-review-card {
+  padding: 25px;
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 20px;
+  border: 1px solid var(--gray-200);
+  transition: all 0.2s ease;
+}
+
+.community-review-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--pink-primary);
+}
+
+.community-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.review-author {
+  font-weight: 700;
+  color: var(--pink-primary);
+  margin-right: 15px;
+}
+
+.review-service-tag {
+  font-size: 13px;
+  padding: 4px 12px;
+  background-color: var(--pink-soft);
+  color: var(--pink-primary);
+  border-radius: 20px;
+  margin-right: 10px;
+}
+
+.review-pet-breed {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+.review-date {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+.community-review-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 15px;
+}
+
+.rating-stars-small {
+  color: #ffc107;
+  font-size: 14px;
+}
+
+.community-review-comment {
+  font-size: 15px;
+  color: var(--gray-700);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1200px) {
+  .profile-container {
+    padding: 0 30px 50px;
+  }
+  
+  .nav-center {
+    gap: 30px;
+  }
+}
+
+@media (max-width: 992px) {
+  .profile-header-nav {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 0;
+  }
+  
+  .nav-center {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .nav-right {
+    order: 2;
+  }
+  
+  .welcome-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 25px;
+  }
+  
+  .pet-avatars {
+    justify-content: center;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .community-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .booking-card-full {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .booking-service-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .booking-actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 0 20px 40px;
+  }
+  
+  .nav-center {
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .nav-link {
+    font-size: 14px;
+  }
+  
+  .notifications-panel {
+    width: 320px;
+    right: -100%;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .tab-btn {
+    flex: 1 1 calc(50% - 10px);
+  }
+  
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .booking-actions {
+    flex-direction: column;
+  }
+  
+  .btn-reschedule, .btn-cancel {
+    width: 100%;
+  }
+  
+  .past-booking-header,
+  .past-booking-details,
+  .past-booking-footer {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .past-booking-actions {
+    width: 100%;
+  }
+  
+  .btn-book-again, .btn-leave-review {
+    flex: 1;
+  }
+  
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .order-footer {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .review-form-container {
+    padding: 25px;
+  }
+  
+  .stars-container {
+    gap: 8px;
+  }
+  
+  .star {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-container {
+    padding: 0 15px 30px;
+  }
+  
+  .welcome-text h1 {
+    font-size: 24px;
+  }
+  
+  .welcome-text p {
+    font-size: 16px;
+  }
+  
+  .nav-center {
+    gap: 12px;
+  }
+  
+  .nav-link {
+    font-size: 13px;
+  }
+  
+  .notifications-panel {
+    width: 280px;
+    right: -50px;
+  }
+  
+  .user-profile-badge .user-name {
+    display: none;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .tab-btn {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+  
+  .booking-card-full {
+    padding: 20px;
+  }
+  
+  .pet-placeholder {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+  }
+  
+  .booking-service-header h3 {
+    font-size: 18px;
+  }
+  
+  .price-value {
+    font-size: 18px;
+  }
+  
+  .review-card-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .review-actions {
+    flex-direction: column;
+  }
+  
+  .btn-edit-review,
+  .btn-delete-review {
+    width: 100%;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-content {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.booking-card-full,
+.order-card-full,
+.review-card-full {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-100);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pink-primary);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pink-hover);
+}
