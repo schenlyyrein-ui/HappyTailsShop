@@ -1,0 +1,620 @@
+.ht-choose-service {
+  min-height: 100vh;
+  background-color: #fff2fa;
+  font-family: 'Inter', sans-serif;
+  padding-top: 20px;
+}
+
+.ht-service-container {
+  padding-top: 20px;
+  padding-bottom: 60px;
+}
+
+.ht-service-title-row {
+  margin-bottom: 40px;
+}
+
+.ht-service-main-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.ht-service-subtitle {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Progress Steps - NO ICONS */
+.ht-service-progress-row {
+  margin: 60px 0;
+}
+
+.ht-service-progress-steps {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ht-service-progress-bar {
+  height: 6px;
+  background-color: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ht-service-progress-bar .progress-bar {
+  background: linear-gradient(90deg, #f53799 0%, #ff6bc0 100%);
+  transition: width 0.5s ease;
+  border-radius: 3px;
+}
+
+.ht-service-step-indicators {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-top: -22px;
+}
+
+.ht-service-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  z-index: 2;
+  min-width: 100px;
+}
+
+.ht-service-step-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #7f8c8d;
+  margin-bottom: 12px;
+  border: 3px solid #e9ecef;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Show number always */
+.ht-service-step-circle span {
+  display: block;
+}
+
+.ht-service-step-active .ht-service-step-circle {
+  background: linear-gradient(135deg, #f53799, #ff6bc0);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(245, 55, 153, 0.4);
+  border-color: #f53799;
+}
+
+.ht-service-step-label {
+  font-weight: 600;
+  color: #7f8c8d;
+  font-size: 0.95rem;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  margin-top: 5px;
+}
+
+.ht-service-step-active .ht-service-step-label {
+  color: #f53799;
+  font-weight: 700;
+  transform: translateY(2px);
+}
+
+/* Content Section */
+.ht-service-content-row {
+  margin-bottom: 40px;
+}
+
+.ht-service-card {
+  border: none;
+  border-radius: 25px;
+  box-shadow: 0 15px 40px rgba(245, 55, 153, 0.15);
+  background-color: white;
+  overflow: hidden;
+  border: 3px solid #ff6bc0;
+  padding: 40px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.ht-service-card-body {
+  padding: 0;
+}
+
+.ht-service-section {
+  margin-bottom: 40px;
+}
+
+.ht-service-section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.ht-service-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(to right, #f53799, #ff6bc0);
+  border-radius: 2px;
+}
+
+.ht-service-divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #ffe4f1, transparent);
+  margin: 40px 0;
+}
+
+.ht-service-pet-navigation {
+  margin-bottom: 30px;
+}
+
+.ht-service-pet-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 15px 25px;
+  border-radius: 15px;
+  border: 2px solid #ff6bc0;
+  box-shadow: 0 5px 15px rgba(245, 55, 153, 0.15);
+}
+
+.ht-service-pet-nav-btn {
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  background-color: white;
+}
+
+.ht-service-pet-nav-btn:hover:not(:disabled) {
+  background-color: #6c757d;
+  color: white;
+  transform: scale(1.05);
+}
+
+.ht-service-pet-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ht-service-pet-counter {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f53799;
+  background-color: #fff2fa;
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 2px solid #ffe4f1;
+}
+
+.ht-service-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 10px;
+}
+
+.ht-service-option-card {
+  background-color: white;
+  border-radius: 20px;
+  padding: 25px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 3px solid #ffe4f1;
+  position: relative;
+}
+
+.ht-service-option-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(245, 55, 153, 0.25);
+  border-color: #ff6bc0;
+  background-color: #fff2fa;
+}
+
+.ht-service-option-selected {
+  border-color: #f53799;
+  background: linear-gradient(135deg, #fff2fa 0%, #ffe9f5 100%);
+  box-shadow: 0 10px 30px rgba(245, 55, 153, 0.2);
+}
+
+.ht-service-option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.ht-service-option-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  flex: 1;
+}
+
+.ht-service-option-checkmark {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #f53799, #ff6bc0);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(245, 55, 153, 0.3);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s ease;
+}
+
+.ht-service-option-selected .ht-service-option-checkmark {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ht-service-option-description {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  font-weight: 400;
+}
+
+.ht-service-option-price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ht-service-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #f53799;
+}
+
+.ht-service-size {
+  font-size: 1rem;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+.ht-service-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.ht-service-checkbox-grid-small {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ht-service-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+}
+
+.ht-service-checkbox-item:hover {
+  background-color: #fff2fa;
+  transform: translateY(-2px);
+}
+
+.ht-service-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  background-color: white;
+}
+
+.ht-service-checkbox-checked {
+  background-color: #f53799;
+  border-color: #f53799;
+}
+
+.ht-service-checkbox-label {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.ht-service-ala-carte-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ht-service-ala-carte-group {
+  border: 2px solid #ffe4f1;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.ht-service-ala-carte-group:hover {
+  border-color: #ff6bc0;
+  box-shadow: 0 8px 20px rgba(245, 55, 153, 0.15);
+}
+
+.ht-service-ala-carte-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid #ffe4f1;
+  transition: all 0.3s ease;
+  background-color: white;
+}
+
+.ht-service-ala-carte-group-header {
+  border: none;
+  border-radius: 15px 15px 0 0;
+}
+
+.ht-service-ala-carte-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(245, 55, 153, 0.2);
+  border-color: #ff6bc0;
+  background-color: #fff2fa;
+}
+
+.ht-service-ala-carte-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.ht-service-ala-carte-label {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.ht-service-ala-carte-price {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ht-service-ala-carte-suboptions {
+  padding: 20px;
+  background-color: #fff9fb;
+  border-top: 2px solid #ffe4f1;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ht-service-suboption-group {
+  margin-top: 15px;
+}
+
+.ht-service-suboption-title {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding-left: 10px;
+}
+
+.ht-service-button-container {
+  margin-top: 50px;
+  padding-top: 30px;
+  border-top: 2px solid #ffe4f1;
+}
+
+.ht-service-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ht-service-back-btn {
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  font-weight: 600;
+  padding: 14px 40px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  background-color: white;
+}
+
+.ht-service-back-btn:hover {
+  background-color: #6c757d;
+  color: white;
+  transform: scale(1.05);
+  border-color: #6c757d;
+}
+
+.ht-service-continue-btn {
+  background: linear-gradient(135deg, #f53799 0%, #ff6bc0 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 14px 50px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 20px rgba(245, 55, 153, 0.25);
+}
+
+.ht-service-continue-btn:hover {
+  background: linear-gradient(135deg, #d42d87 0%, #ff5ab8 100%);
+  transform: scale(1.05);
+  box-shadow: 0 12px 25px rgba(245, 55, 153, 0.35);
+}
+
+@media (max-width: 992px) {
+  .ht-service-main-title {
+    font-size: 2.5rem;
+  }
+  
+  .ht-service-card {
+    padding: 30px;
+  }
+  
+  .ht-service-options-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ht-service-checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .ht-choose-service {
+    padding-top: 10px;
+  }
+  
+  .ht-service-container {
+    padding-top: 10px;
+    padding-bottom: 40px;
+  }
+  
+  .ht-service-main-title {
+    font-size: 2rem;
+  }
+  
+  .ht-service-subtitle {
+    font-size: 1rem;
+    padding: 0 20px;
+  }
+  
+  .ht-service-step-label {
+    font-size: 0.8rem;
+  }
+  
+  .ht-service-step-circle {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+  
+  .ht-service-card {
+    padding: 25px;
+  }
+  
+  .ht-service-section-title {
+    font-size: 1.5rem;
+  }
+  
+  .ht-service-option-title {
+    font-size: 1.2rem;
+  }
+  
+  .ht-service-option-description {
+    font-size: 0.95rem;
+  }
+  
+  .ht-service-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .ht-service-back-btn,
+  .ht-service-continue-btn {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .ht-service-main-title {
+    font-size: 1.8rem;
+  }
+  
+  .ht-service-progress-row {
+    margin: 40px 0;
+  }
+  
+  .ht-service-step-indicators {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .ht-service-step {
+    min-width: 80px;
+  }
+  
+  .ht-service-card {
+    padding: 20px;
+  }
+  
+  .ht-service-option-card {
+    padding: 20px;
+  }
+  
+  .ht-service-ala-carte-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .ht-service-ala-carte-price {
+    align-self: flex-start;
+    margin-left: 39px;
+  }
+}
