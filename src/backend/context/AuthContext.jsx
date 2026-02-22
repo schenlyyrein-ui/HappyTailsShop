@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Load the user's profile row from public.profiles
   async function loadProfile(userId) {
     const { data, error } = await supabase
       .from("profiles")
@@ -15,28 +16,61 @@ export function AuthProvider({ children }) {
       .eq("id", userId)
       .single();
 
-    if (!error) setProfile(data);
+    if (error) {
+      // If profile doesn't exist or RLS blocks it, keep profile null
+      setProfile(null);
+      return null;
+    }
+
+    setProfile(data);
+    return data;
   }
 
+  // Initialize session + keep state in sync on auth changes
   useEffect(() => {
-    // 1) get session on refresh
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      const u = data?.session?.user ?? null;
-      setUser(u);
-      if (u) await loadProfile(u.id);
-      setLoading(false);
-    })();
+    let alive = true;
 
-    // 2) listen for auth changes
+    const init = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (!alive) return;
+
+      if (error) {
+        setUser(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
+      const sessionUser = data?.session?.user ?? null;
+      setUser(sessionUser);
+
+      if (sessionUser) {
+        await loadProfile(sessionUser.id);
+      } else {
+        setProfile(null);
+      }
+
+      setLoading(false);
+    };
+
+    init();
+
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      setProfile(null);
-      if (u) await loadProfile(u.id);
+      const sessionUser = session?.user ?? null;
+
+      setUser(sessionUser);
+
+      if (sessionUser) {
+        await loadProfile(sessionUser.id);
+      } else {
+        setProfile(null);
+      }
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      alive = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   const value = useMemo(
@@ -46,10 +80,16 @@ export function AuthProvider({ children }) {
       loading,
 
       async login(email, password) {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
         if (error) throw new Error(error.message);
-        setUser(data.user);
-        if (data.user) await loadProfile(data.user.id);
+
+        // Let the auth listener update state, but we can also eagerly load profile:
+        const u = data?.user ?? null;
+        if (u) await loadProfile(u.id);
       },
 
       async signup(payload) {
@@ -58,13 +98,13 @@ export function AuthProvider({ children }) {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw new Error(error.message);
 
-        const u = data.user;
-        setUser(u);
+        const u = data?.user ?? null;
 
-        // If email confirmation is ON, u may exist but session may be null until confirmed.
-        // Still safe to try profile insert only when we have a user id.
+        // If email confirmation is OFF, session exists and we can write profile immediately.
+        // If confirmation is ON, u may exist but session may be null—still okay to attempt
+        // profile write only when we have a user id and RLS allows it.
         if (u?.id) {
-          const { error: profErr } = await supabase.from("profiles").insert({
+          const { error: profErr } = await supabase.from("profiles").upsert({
             id: u.id,
             first_name: firstName,
             last_name: lastName,
@@ -72,12 +112,17 @@ export function AuthProvider({ children }) {
           });
 
           if (profErr) throw new Error(profErr.message);
+
           await loadProfile(u.id);
         }
       },
 
       async logout() {
-        await supabase.auth.signOut();
+        // Local sign-out clears the stored session immediately
+        const { error } = await supabase.auth.signOut({ scope: "local" });
+        if (error) throw new Error(error.message);
+
+        // State will also be cleared by onAuthStateChange, but clearing here makes UI instant
         setUser(null);
         setProfile(null);
       },

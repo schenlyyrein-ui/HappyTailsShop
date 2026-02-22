@@ -7,7 +7,7 @@ const HappyTails2 = () => {
   const navigate = useNavigate();
 
   // ✅ Auth (from AuthContext)
-  const { user, login, signup, logout } = useAuth();
+  const { user, profile, login, signup, logout } = useAuth();
   const [authError, setAuthError] = useState('');
 
   // Login/Signup dropdown state
@@ -199,14 +199,29 @@ const HappyTails2 = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    setAuthError('');
-    setIsLoginOpen(false);
-    setIsMobileMenuOpen(false);
-    clearLoginFields();
-    clearSignupFields();
-  };
+      const handleLogout = async () => {
+        console.log("LOGOUT CLICKED ✅");
+
+        try {
+          // Don’t let it hang forever
+          await Promise.race([
+            logout(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Logout timed out")), 3000)
+            ),
+          ]);
+        } catch (e) {
+          console.log("LOGOUT ERROR ❌", e);
+
+          // fallback: clear Supabase token locally (last resort)
+          Object.keys(localStorage).forEach((k) => {
+            if (k.includes("-auth-token")) localStorage.removeItem(k);
+          });
+        }
+
+        setIsLoginOpen(false);
+        setIsMobileMenuOpen(false);
+      };
 
   const handleNavLinkClick = () => {
     setIsMobileMenuOpen(false);
@@ -335,7 +350,7 @@ const HappyTails2 = () => {
                   onClick={toggleLoginDropdown}
                   aria-expanded={isLoginOpen}
                 >
-                  {user ? `Hi, ${user.firstName || 'User'}` : 'Login/Sign up'}{' '}
+                 {user ? `Hi, ${profile?.first_name || user.email}` : 'Login/Sign up'}{' '}
                   <span className={`ht2-dropdown-icon ${isLoginOpen ? 'open' : ''}`}>▼</span>
                 </button>
 
