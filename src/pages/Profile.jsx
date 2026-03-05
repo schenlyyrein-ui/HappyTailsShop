@@ -1,0 +1,1338 @@
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import SidebarProfile from '../components/SidebarProfile';
+import './Profile.css';
+
+const Profile = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [hoverRating, setHoverRating] = useState(0);
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [selectedServiceFilter, setSelectedServiceFilter] = useState('All Services');
+  const [orderFilter, setOrderFilter] = useState('all');
+  const [expandedTracking, setExpandedTracking] = useState({});
+  const [showReviewPicker, setShowReviewPicker] = useState(false);
+  
+  // Notifications state
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: 'Appointment Tomorrow!',
+      message: "Bella's grooming appointment is tomorrow at 10:00 AM",
+      time: '2 hours ago',
+      read: false
+    },
+    {
+      id: 2,
+      title: 'Booking Confirmed',
+      message: 'Your Pet Café reservation for Dec 25 has been confirmed',
+      time: '1 day ago',
+      read: false
+    },
+    {
+      id: 3,
+      title: 'Rate Your Experience',
+      message: "How was Max's birthday party? Leave a review!",
+      time: '3 days ago',
+      read: false
+    },
+    {
+      id: 4,
+      title: 'Order Completed',
+      message: 'We delivered your order on 2024-01-01',
+      time: '5 days ago',
+      read: true
+    }
+  ]);
+
+  // User data
+  const user = {
+    name: 'Sarah Chen',
+    email: 'sarah.chen@email.com',
+    phone: '+63 912 345 6789',
+    memberSince: '2023',
+    avatar: '/src/assets/user-avatar.jpg',
+    petCount: 3,
+    pets: [
+      { name: 'Bella', type: 'Golden Retriever' },
+      { name: 'Max', type: 'Shih Tzu' },
+      { name: 'Luna', type: 'Persian Cat' }
+    ]
+  };
+
+  // Stats data
+  const stats = {
+    upcoming: 3,
+    completed: 12,
+    orders: 8,
+    reviews: 5,
+    averageRating: 4.7,
+    totalReviews: 10,
+    fiveStarCount: 7,
+    fourStarCount: 2,
+    threeStarCount: 1,
+    twoStarCount: 0,
+    oneStarCount: 0,
+    recommendedPercent: 70,
+    verifiedCount: 7
+  };
+
+  // Upcoming bookings
+  const [upcomingBookings, setUpcomingBookings] = useState([
+    {
+      id: 1,
+      service: 'Full Grooming Package',
+      serviceType: 'grooming',
+      petName: 'Bella',
+      petBreed: 'Golden Retriever',
+      date: 'Dec 20, 2024',
+      time: '10:00 AM',
+      status: 'Confirmed',
+      price: '₱850 - ₱1,200',
+      note: '*Price may vary depending on pet size/condition'
+    },
+    {
+      id: 2,
+      service: 'Pet Boarding',
+      serviceType: 'boarding',
+      petName: 'Max',
+      petBreed: 'Shih Tzu',
+      date: 'Dec 22, 2024',
+      time: '9:00 AM',
+      status: 'Confirmed',
+      price: '₱500/night',
+      note: '* Price may vary depending on pet size/condition'
+    },
+    {
+      id: 3,
+      service: 'Pet Café Reservation',
+      serviceType: 'petcafe',
+      petName: 'Luna',
+      petBreed: 'Persian Cat',
+      date: 'Dec 25, 2024',
+      time: '2:00 PM',
+      status: 'Confirmed',
+      price: '₱299 entry',
+      note: '* Price may vary depending on pet size/condition'
+    }
+  ]);
+
+  // Past bookings
+  const [pastBookings, setPastBookings] = useState([
+    {
+      id: 4,
+      service: 'Full Grooming Package',
+      serviceType: 'grooming',
+      petName: 'Bella',
+      petBreed: 'Golden Retriever',
+      date: 'Dec 5, 2024',
+      time: '11:00 AM',
+      status: 'Completed',
+      price: '₱950',
+      rating: 4,
+      reviewed: true
+    },
+    {
+      id: 5,
+      service: 'Pet Birthday Package',
+      serviceType: 'bdaypawty',
+      petName: 'Max',
+      petBreed: 'Shih Tzu',
+      date: 'Nov 28, 2024',
+      time: '2:00 PM',
+      status: 'Completed',
+      price: '₱2,500',
+      rating: 3,
+      reviewed: true
+    },
+    {
+      id: 6,
+      service: 'Pet Café Visit',
+      serviceType: 'petcafe',
+      petName: 'Luna',
+      petBreed: 'Persian Cat',
+      date: 'Nov 20, 2024',
+      time: '3:00 PM',
+      status: 'Completed',
+      price: '₱299',
+      rating: 4,
+      reviewed: true
+    }
+  ]);
+  // Order history
+  const [orderHistory, setOrderHistory] = useState([
+    {
+      id: 'ORD-2024-001',
+      date: 'Dec 15, 2024',
+      items: [
+        { name: 'Premium Dog Food (5kg)', quantity: 1 },
+        { name: 'Chew Toys Set', quantity: 1 }
+      ],
+      total: 'PHP 1,450',
+      status: 'Paid',
+      deliveryStatus: 'Completed',
+      riderName: 'Rider Paolo',
+      riderContact: '0917-555-1122',
+      riderVehicle: 'Motorbike • HT-217',
+      updatedAt: 'Dec 16, 2024 11:15 AM',
+      deliveredAt: 'Dec 16, 2024 10:48 AM',
+      trackingUpdates: [
+        { time: 'Dec 15, 2024 8:02 PM', title: 'Order Placed', details: 'Your order was received.' },
+        { time: 'Dec 15, 2024 8:15 PM', title: 'Payment Confirmed', details: 'Payment was confirmed.' },
+        { time: 'Dec 15, 2024 9:05 PM', title: 'Preparing Order', details: 'Items are packed and ready for dispatch.' },
+        { time: 'Dec 16, 2024 9:20 AM', title: 'Out for Delivery', details: 'Rider Paolo is on the way.' },
+        { time: 'Dec 16, 2024 10:48 AM', title: 'Delivered', details: 'Order has been delivered successfully.' }
+      ]
+    },
+    {
+      id: 'ORD-2024-002',
+      date: 'Dec 10, 2024',
+      items: [
+        { name: 'Cat Litter (10L)', quantity: 1 },
+        { name: 'Scratching Post', quantity: 1 }
+      ],
+      total: 'PHP 890',
+      status: 'Paid',
+      deliveryStatus: 'Completed',
+      riderName: 'Rider Mia',
+      riderContact: '0917-555-2244',
+      riderVehicle: 'Scooter • HT-184',
+      updatedAt: 'Dec 11, 2024 7:32 PM',
+      deliveredAt: 'Dec 11, 2024 7:05 PM',
+      trackingUpdates: [
+        { time: 'Dec 10, 2024 1:11 PM', title: 'Order Placed', details: 'Your order was received.' },
+        { time: 'Dec 10, 2024 1:18 PM', title: 'Payment Confirmed', details: 'Payment was confirmed.' },
+        { time: 'Dec 10, 2024 2:03 PM', title: 'Preparing Order', details: 'Items are packed and ready for dispatch.' },
+        { time: 'Dec 11, 2024 5:42 PM', title: 'Out for Delivery', details: 'Rider Mia is delivering your order.' },
+        { time: 'Dec 11, 2024 7:05 PM', title: 'Delivered', details: 'Order has been delivered successfully.' }
+      ]
+    },
+    {
+      id: 'ORD-2024-003',
+      date: 'Dec 18, 2024',
+      items: [
+        { name: 'Pet Shampoo', quantity: 1 },
+        { name: 'Grooming Brush', quantity: 1 },
+        { name: 'Nail Clipper', quantity: 1 }
+      ],
+      total: 'PHP 650',
+      status: 'Pending',
+      deliveryStatus: 'Processing',
+      riderName: 'Rider Carlo',
+      riderContact: '0917-555-7788',
+      riderVehicle: 'Motorbike • HT-305',
+      updatedAt: 'Dec 18, 2024 2:20 PM',
+      eta: 'Dec 19, 2024 3:00 PM',
+      trackingUpdates: [
+        { time: 'Dec 18, 2024 12:06 PM', title: 'Order Placed', details: 'Your order was received.' },
+        { time: 'Dec 18, 2024 12:20 PM', title: 'Payment Confirmed', details: 'Waiting for rider assignment.' },
+        { time: 'Dec 18, 2024 2:20 PM', title: 'Preparing Order', details: 'We are packing your items now.' }
+      ]
+    },
+    {
+      id: 'ORD-2024-004',
+      date: 'Dec 19, 2024',
+      items: [
+        { name: 'Dog Vitamins', quantity: 1 },
+        { name: 'Dental Chews', quantity: 2 }
+      ],
+      total: 'PHP 780',
+      status: 'Paid',
+      deliveryStatus: 'Out for Delivery',
+      riderName: 'Rider Bea',
+      riderContact: '0917-555-9011',
+      riderVehicle: 'Motorbike • HT-412',
+      updatedAt: 'Dec 19, 2024 10:05 AM',
+      eta: 'Dec 19, 2024 12:00 PM',
+      trackingUpdates: [
+        { time: 'Dec 19, 2024 7:40 AM', title: 'Order Placed', details: 'Your order was received.' },
+        { time: 'Dec 19, 2024 7:51 AM', title: 'Payment Confirmed', details: 'Payment was confirmed.' },
+        { time: 'Dec 19, 2024 8:33 AM', title: 'Preparing Order', details: 'Items are packed and ready for dispatch.' },
+        { time: 'Dec 19, 2024 10:05 AM', title: 'Out for Delivery', details: 'Rider Bea is heading to your location.' }
+      ]
+    },
+    {
+      id: 'ORD-2024-005',
+      date: 'Dec 21, 2024',
+      items: [
+        { name: 'Pet Wipes', quantity: 2 },
+        { name: 'Pee Pads', quantity: 1 }
+      ],
+      total: 'PHP 540',
+      status: 'Refunded',
+      deliveryStatus: 'Cancelled',
+      riderName: 'Not assigned',
+      updatedAt: 'Dec 21, 2024 3:10 PM',
+      cancelledAt: 'Dec 21, 2024 3:10 PM',
+      cancelledStage: 'Preparing Order',
+      cancelReason: 'Customer requested cancellation',
+      trackingUpdates: [
+        { time: 'Dec 21, 2024 1:35 PM', title: 'Order Placed', details: 'Your order was received.' },
+        { time: 'Dec 21, 2024 1:39 PM', title: 'Payment Confirmed', details: 'Payment was confirmed.' },
+        { time: 'Dec 21, 2024 2:26 PM', title: 'Preparing Order', details: 'Items were being packed.' },
+        { time: 'Dec 21, 2024 3:10 PM', title: 'Cancelled', details: 'Customer requested cancellation.' }
+      ]
+    }
+  ]);
+  // User reviews
+  const [userReviews, setUserReviews] = useState([
+    {
+      id: 1,
+      service: 'Full Grooming Package',
+      petName: 'Bella',
+      petBreed: 'Golden Retriever',
+      date: 'Dec 5, 2024',
+      rating: 5,
+      comment: 'Amazing service! Bella came out looking like a superstar. The groomers were so gentle and patient with her.'
+    },
+    {
+      id: 2,
+      service: 'Pet Café Visit',
+      petName: 'Luna',
+      petBreed: 'Persian Cat',
+      date: 'Nov 20, 2024',
+      rating: 5,
+      comment: 'Great atmosphere and the staff was very welcoming. Luna loved the cat-friendly treats!'
+    }
+  ]);
+
+  // Community reviews stats
+  const communityStats = {
+    averageRating: 4.7,
+    totalReviews: 10,
+    fiveStarCount: 7,
+    fourStarCount: 2,
+    threeStarCount: 1,
+    twoStarCount: 0,
+    oneStarCount: 0,
+    recommendedPercent: 70,
+    verifiedCount: 7,
+    reviewsByService: [
+      { service: 'All Services', count: 10 },
+      { service: 'Full Grooming Package', count: 4 },
+      { service: 'Pet Boarding', count: 2 },
+      { service: 'Pet Birthday Package', count: 2 },
+      { service: 'Pet Café Reservation', count: 2 }
+    ]
+  };
+
+  // Community reviews
+  const [communityReviews, setCommunityReviews] = useState([
+    {
+      id: 1,
+      author: 'Maria M.',
+      service: 'Full Grooming Package',
+      petBreed: 'Golden Retriever',
+      date: 'Dec 15, 2024',
+      rating: 5.0,
+      comment: 'Excellent service! Very professional and caring staff.',
+      helpful: 12
+    },
+    {
+      id: 2,
+      author: 'John D.',
+      service: 'Pet Boarding',
+      petBreed: 'Labrador',
+      date: 'Dec 12, 2024',
+      rating: 4.5,
+      comment: 'Great facility, my dog was well taken care of.',
+      helpful: 8
+    }
+  ]);
+
+  // Navigation functions
+  const handleReschedule = (bookingId) => {
+    const booking = upcomingBookings.find(b => b.id === bookingId);
+    
+    switch(booking.serviceType) {
+      case 'grooming':
+        navigate('/booking', { state: { service: 'grooming', booking } });
+        break;
+      case 'boarding':
+        navigate('/boarding/book', { state: { booking } });
+        break;
+      case 'petcafe':
+        navigate('/petcafe', { state: { booking } });
+        break;
+      default:
+        navigate('/booking', { state: { booking } });
+    }
+  };
+
+  const handleCancel = (bookingId) => {
+    if (window.confirm('Are you sure you want to cancel this booking?')) {
+      setUpcomingBookings(upcomingBookings.filter(b => b.id !== bookingId));
+      alert('Booking cancelled successfully!');
+    }
+  };
+
+  const handleBookAgain = (pastBooking) => {
+    switch(pastBooking.serviceType) {
+      case 'grooming':
+        navigate('/booking', { state: { service: 'grooming', petName: pastBooking.petName } });
+        break;
+      case 'boarding':
+        navigate('/boarding/book', { state: { petName: pastBooking.petName } });
+        break;
+      case 'bdaypawty':
+        navigate('/bookpawty', { state: { petName: pastBooking.petName } });
+        break;
+      case 'petcafe':
+        navigate('/petcafe', { state: { petName: pastBooking.petName } });
+        break;
+      default:
+        navigate('/booking');
+    }
+  };
+
+  const handleLeaveReview = (booking) => {
+    setSelectedBooking(booking);
+    setReviewRating(0);
+    setReviewText('');
+    setEditingReviewId(null);
+    setShowReviewPicker(false);
+    setShowReviewForm(true);
+  };
+
+  const handleEditReview = (reviewId) => {
+    const review = userReviews.find(r => r.id === reviewId);
+    setSelectedBooking(review);
+    setReviewRating(review.rating);
+    setReviewText(review.comment);
+    setEditingReviewId(reviewId);
+    setShowReviewPicker(false);
+    setShowReviewForm(true);
+  };
+
+  const handleDeleteReview = (reviewId) => {
+    if (window.confirm('Are you sure you want to delete this review?')) {
+      setUserReviews(userReviews.filter(r => r.id !== reviewId));
+      alert('Review deleted successfully!');
+    }
+  };
+
+  const handleSubmitReview = (e) => {
+    e.preventDefault();
+    
+    if (reviewRating === 0) {
+      alert('Please select a rating!');
+      return;
+    }
+
+    if (editingReviewId) {
+      setUserReviews(userReviews.map(review => 
+        review.id === editingReviewId 
+          ? { ...review, rating: reviewRating, comment: reviewText, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }
+          : review
+      ));
+      alert('Review updated successfully!');
+    } else {
+      const newReview = {
+        id: userReviews.length + 3,
+        service: selectedBooking.service,
+        petName: selectedBooking.petName,
+        petBreed: selectedBooking.petBreed,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        rating: reviewRating,
+        comment: reviewText
+      };
+      setUserReviews([...userReviews, newReview]);
+      
+      setPastBookings(pastBookings.map(booking => 
+        booking.id === selectedBooking.id 
+          ? { ...booking, reviewed: true }
+          : booking
+      ));
+      
+      alert('Thank you for your review!');
+    }
+    
+    setShowReviewForm(false);
+    setShowReviewPicker(false);
+    setReviewRating(0);
+    setReviewText('');
+    setEditingReviewId(null);
+  };
+
+  const handleViewOrderDetails = (orderId) => {
+    navigate(`/order/${orderId}`);
+  };
+
+  const handleReorder = (order) => {
+    navigate('/checkout', { state: { items: order.items } });
+  };
+
+  const handleViewServiceDetails = (booking) => {
+    switch(booking.serviceType) {
+      case 'grooming':
+        navigate('/grooming');
+        break;
+      case 'boarding':
+        navigate('/boarding');
+        break;
+      case 'bdaypawty':
+        navigate('/bdaypawty');
+        break;
+      case 'petcafe':
+        navigate('/petcafe');
+        break;
+      default:
+        navigate('/choose-service');
+    }
+  };
+
+  const handleHelpful = (reviewId) => {
+    setCommunityReviews(communityReviews.map(review =>
+      review.id === reviewId
+        ? { ...review, helpful: review.helpful + 1 }
+        : review
+    ));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  };
+
+  const markAsRead = (id) => {
+    setNotifications(notifications.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    ));
+  };
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const baseOrderTimeline = ['Order Placed', 'Payment Confirmed', 'Preparing Order', 'Out for Delivery', 'Completed'];
+
+  const getTrackingConfig = (order) => {
+    if (order.deliveryStatus === 'Cancelled') {
+      const cancelledAtStep = order.cancelledStage || 'Preparing Order';
+      const cutoffIndex = Math.max(baseOrderTimeline.indexOf(cancelledAtStep), 0);
+      const timeline = [...baseOrderTimeline.slice(0, cutoffIndex + 1), 'Cancelled'];
+      return { timeline, currentStepIndex: timeline.length - 1 };
+    }
+
+    let currentStepIndex = 0;
+    switch (order.deliveryStatus) {
+      case 'Pending':
+        currentStepIndex = 1;
+        break;
+      case 'Processing':
+        currentStepIndex = 2;
+        break;
+      case 'Out for Delivery':
+        currentStepIndex = 3;
+        break;
+      case 'Completed':
+        currentStepIndex = 4;
+        break;
+      default:
+        currentStepIndex = 0;
+    }
+
+    return { timeline: baseOrderTimeline, currentStepIndex };
+  };
+
+  const getOrderFilterKey = (deliveryStatus) => {
+    if (deliveryStatus === 'Completed') return 'completed';
+    if (deliveryStatus === 'Cancelled') return 'cancelled';
+    return 'inprocess';
+  };
+
+  const orderFilterTabs = [
+    { id: 'all', label: 'All Orders' },
+    { id: 'inprocess', label: 'In Process' },
+    { id: 'completed', label: 'Completed' },
+    { id: 'cancelled', label: 'Cancelled' }
+  ];
+
+  const getTrackingPercent = (timeline, currentStepIndex) => {
+    if (!timeline || timeline.length <= 1) return 0;
+    return Math.round((currentStepIndex / (timeline.length - 1)) * 100);
+  };
+
+  const getTrackingHeadline = (order, currentStep) => {
+    if (order.deliveryStatus === 'Completed') {
+      return 'Delivered successfully';
+    }
+    if (order.deliveryStatus === 'Cancelled') {
+      return `Order cancelled at ${order.cancelledStage || 'processing stage'}`;
+    }
+    if (order.deliveryStatus === 'Out for Delivery') {
+      return `${order.riderName} is on the way to your address`;
+    }
+    return `Current stage: ${currentStep}`;
+  };
+
+  const getTrackingEtaLabel = (order) => {
+    if (order.deliveryStatus === 'Completed') return 'Delivered';
+    if (order.deliveryStatus === 'Cancelled') return 'N/A';
+    return order.eta || 'Updating...';
+  };
+
+  const getTrackingLocation = (order) => {
+    if (order.deliveryStatus === 'Completed') return 'Delivered';
+    if (order.deliveryStatus === 'Cancelled') return 'Cancelled';
+    if (order.deliveryStatus === 'Out for Delivery') return 'Out for Delivery';
+    if (order.deliveryStatus === 'Processing') return 'Preparing Dispatch';
+    return 'Order Received';
+  };
+
+  const filteredOrders = useMemo(() => {
+    if (orderFilter === 'all') {
+      return orderHistory;
+    }
+    return orderHistory.filter((order) => getOrderFilterKey(order.deliveryStatus) === orderFilter);
+  }, [orderFilter, orderHistory]);
+
+  const availableReviewBookings = useMemo(
+    () => pastBookings.filter((booking) => booking.status === 'Completed' && !booking.reviewed),
+    [pastBookings]
+  );
+
+  const toggleTracking = (orderId) => {
+    setExpandedTracking((prev) => ({
+      ...prev,
+      [orderId]: !prev[orderId]
+    }));
+  };
+
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to sign out?')) {
+      localStorage.removeItem('user');
+      navigate('/');
+    }
+  };
+
+  return (
+    <div className="profile-page">
+      {/* Main Content with Sidebar */}
+      <div className="profile-main-layout">
+        {/* Sidebar */}
+        <SidebarProfile 
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          user={user}
+          unreadCount={unreadCount}
+          onLogout={handleLogout}
+        />
+
+        {/* Content Area */}
+        <div className="profile-content-wrapper">
+          {/* Welcome Banner */}
+          <div className="welcome-banner">
+            <div className="welcome-content">
+              <div>
+                <h1 className="welcome-title">My Pet Care Journey</h1>
+                <p className="welcome-subtitle">Welcome back, {user.name}! Here's what's happening with your furry friends</p>
+              </div>
+              <div className="pet-tags">
+                {user.pets.map(pet => (
+                  <span key={pet.name} className="pet-tag">
+                    {pet.name} · {pet.type}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="profile-content-area">
+            {/* Stats Cards */}
+            <div className="stats-grid">
+              <div className="stat-card">
+                <div className="stat-number">{stats.upcoming}</div>
+                <div className="stat-label">Upcoming</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number">{stats.completed}</div>
+                <div className="stat-label">Completed</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number">{stats.orders}</div>
+                <div className="stat-label">Orders</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number">{stats.reviews}</div>
+                <div className="stat-label">Reviews</div>
+              </div>
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="tab-navigation">
+              <button 
+                className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+                onClick={() => setActiveTab('overview')}
+              >
+                Overview
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
+                onClick={() => setActiveTab('upcoming')}
+              >
+                Upcoming
+                {upcomingBookings.length > 0 && (
+                  <span className="tab-badge">{upcomingBookings.length}</span>
+                )}
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'past' ? 'active' : ''}`}
+                onClick={() => setActiveTab('past')}
+              >
+                Past
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
+                onClick={() => setActiveTab('orders')}
+              >
+                Orders
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+                onClick={() => setActiveTab('reviews')}
+              >
+                Reviews
+                <span className="tab-badge">{userReviews.length}</span>
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'community' ? 'active' : ''}`}
+                onClick={() => setActiveTab('community')}
+              >
+                Community
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            <div className="tab-content">
+              
+              {/* OVERVIEW TAB */}
+{activeTab === 'overview' && (
+  <div className="overview-tab">
+    <div className="overview-grid">
+      {/* Next Upcoming Booking */}
+      {upcomingBookings.length > 0 && (
+        <div className="feature-card upcoming-main-card">
+          <h3 className="feature-card-title">Next Upcoming</h3>
+          <div className="next-booking">
+            <div className="next-booking-service">{upcomingBookings[0].service}</div>
+            <div className="next-booking-pet">{upcomingBookings[0].petName} · {upcomingBookings[0].petBreed}</div>
+            <div className="next-booking-time">{upcomingBookings[0].date} at {upcomingBookings[0].time}</div>
+            <div className="next-booking-actions">
+              <button className="btn-secondary" onClick={() => handleViewServiceDetails(upcomingBookings[0])}>
+                View Details
+              </button>
+              <button className="btn-primary" onClick={() => handleReschedule(upcomingBookings[0].id)}>
+                Reschedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recent Activity */}
+      <div className="feature-card activity-main-card">
+        <h3 className="feature-card-title">Recent Activity</h3>
+        <div className="activity-list">
+          <div className="activity-item">
+            <div className="activity-dot"></div>
+            <div className="activity-content">
+              <div className="activity-text">Completed grooming for Bella</div>
+              <div className="activity-time">2 days ago</div>
+            </div>
+          </div>
+          <div className="activity-item">
+            <div className="activity-dot"></div>
+            <div className="activity-content">
+              <div className="activity-text">Order ORD-2024-003 is processing</div>
+              <div className="activity-time">3 days ago</div>
+            </div>
+          </div>
+          <div className="activity-item">
+            <div className="activity-dot"></div>
+            <div className="activity-content">
+              <div className="activity-text">You left a review for Pet Café</div>
+              <div className="activity-time">5 days ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="overview-grid overview-grid-compact">
+
+      {/* Upcoming Preview */}
+      <div className="feature-card upcoming-preview-card">
+        <div className="profile-card-header">
+          <h3 className="feature-card-title">Upcoming</h3>
+          <button className="view-link" onClick={() => setActiveTab('upcoming')}>View all</button>
+        </div>
+        <div className="preview-items">
+          {upcomingBookings.slice(0, 2).map(booking => (
+            <div key={booking.id} className="preview-item">
+              <div className="preview-info">
+                <div className="preview-title">{booking.service}</div>
+                <div className="preview-subtitle">{booking.petName} · {booking.date}</div>
+              </div>
+              <span className="status confirmed">{booking.status}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Orders */}
+      <div className="feature-card orders-preview-card">
+        <div className="profile-card-header">
+          <h3 className="feature-card-title">Recent Orders</h3>
+          <button className="view-link" onClick={() => setActiveTab('orders')}>View all</button>
+        </div>
+        <div className="preview-items">
+          {orderHistory.slice(0, 2).map(order => (
+            <div key={order.id} className="preview-item">
+              <div className="preview-info">
+                <div className="preview-title">{order.id}</div>
+                <div className="preview-subtitle">{order.items.length} items · {order.date}</div>
+              </div>
+              <span className={`status ${order.deliveryStatus.toLowerCase().replace(/\s+/g, '-')}`}>
+                {order.deliveryStatus}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+    
+
+              {/* UPCOMING TAB */}
+              {activeTab === 'upcoming' && (
+                <div className="upcoming-tab">
+                  <h2 className="section-title">Upcoming Bookings</h2>
+                  <p className="section-subtitle">You have {upcomingBookings.length} upcoming appointment{upcomingBookings.length !== 1 ? 's' : ''}</p>
+                  
+                  {upcomingBookings.length > 0 ? (
+                    <div className="bookings-list">
+                      {upcomingBookings.map(booking => (
+                        <div key={booking.id} className="booking-card">
+                          <div className="booking-header">
+                            <div>
+                              <h3>{booking.service}</h3>
+                              <div className="booking-pet-info">
+                                <span className="pet-name">{booking.petName}</span>
+                                <span className="pet-breed">{booking.petBreed}</span>
+                              </div>
+                            </div>
+                            <span className="status-badge confirmed">{booking.status}</span>
+                          </div>
+                          
+                          <div className="booking-datetime">
+                            <div className="datetime-row">
+                              <span className="datetime-label">Date</span>
+                              <span className="datetime-value">{booking.date}</span>
+                            </div>
+                            <div className="datetime-row">
+                              <span className="datetime-label">Time</span>
+                              <span className="datetime-value">{booking.time}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="booking-price">
+                            <span className="price-label">Estimated Price</span>
+                            <span className="price-value">{booking.price}</span>
+                          </div>
+                          
+                          {booking.note && (
+                            <p className="booking-note">{booking.note}</p>
+                          )}
+                          
+                          <div className="booking-actions">
+                            <button className="btn-secondary" onClick={() => handleReschedule(booking.id)}>
+                              Reschedule
+                            </button>
+                            <button className="btn-outline" onClick={() => handleCancel(booking.id)}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <h3>No Upcoming Bookings</h3>
+                      <p>Ready to pamper your pet? Book a service now!</p>
+                      <button className="btn-primary" onClick={() => navigate('/choose-service')}>
+                        Browse Services
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* PAST TAB */}
+              {activeTab === 'past' && (
+                <div className="past-tab">
+                  <h2 className="section-title">Past Bookings</h2>
+                  <p className="section-subtitle">Your completed appointments</p>
+                  
+                  {pastBookings.length > 0 ? (
+                    <div className="bookings-list">
+                      {pastBookings.map(booking => (
+                        <div key={booking.id} className="booking-card past">
+                          <div className="booking-header">
+                            <div>
+                              <h3>{booking.service}</h3>
+                              <div className="booking-pet-info">
+                                <span className="pet-name">{booking.petName}</span>
+                                <span className="pet-breed">{booking.petBreed}</span>
+                              </div>
+                            </div>
+                            <span className="status-badge completed">Completed</span>
+                          </div>
+                          
+                          <div className="booking-datetime">
+                            <div className="datetime-row">
+                              <span className="datetime-label">Date</span>
+                              <span className="datetime-value">{booking.date}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="booking-price">
+                            <span className="price-label">Paid</span>
+                            <span className="price-value">{booking.price}</span>
+                          </div>
+                          
+                          {booking.rating && (
+                            <div className="rating-display">
+                              <span className="rating-stars">{'★'.repeat(booking.rating)}</span>
+                              <span className="rating-text">{booking.rating}.0/5.0</span>
+                            </div>
+                          )}
+                          
+                          <div className="booking-actions">
+                            <button className="btn-secondary" onClick={() => handleBookAgain(booking)}>
+                              Book Again
+                            </button>
+                            {!booking.reviewed && (
+                              <button className="btn-outline" onClick={() => handleLeaveReview(booking)}>
+                                Leave Review
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <h3>No Past Bookings</h3>
+                      <p>Your completed appointments will appear here</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ORDERS TAB */}
+              {activeTab === 'orders' && (
+                <div className="orders-tab">
+                  <h2 className="section-title">Order History</h2>
+                  <p className="section-subtitle">Track your deliveries and view completed orders</p>
+
+                  <div className="order-filter-tabs">
+                    {orderFilterTabs.map((tab) => (
+                      <button
+                        key={tab.id}
+                        className={`order-filter-btn ${orderFilter === tab.id ? 'active' : ''}`}
+                        onClick={() => setOrderFilter(tab.id)}
+                      >
+                        {tab.label}
+                        <span className="order-filter-count">
+                          {tab.id === 'all'
+                            ? orderHistory.length
+                            : orderHistory.filter((order) => getOrderFilterKey(order.deliveryStatus) === tab.id).length}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {filteredOrders.length > 0 ? (
+                    <div className="orders-list">
+                      {filteredOrders.map(order => {
+                        const { timeline, currentStepIndex } = getTrackingConfig(order);
+                        const isCompleted = order.deliveryStatus === 'Completed';
+                        const isCancelled = order.deliveryStatus === 'Cancelled';
+                        const showTracking = !!expandedTracking[order.id];
+                        const latestTrackingUpdate = (order.trackingUpdates && order.trackingUpdates.length > 0)
+                          ? order.trackingUpdates[order.trackingUpdates.length - 1]
+                          : null;
+                        const currentStep = timeline[currentStepIndex] || timeline[0];
+                        const trackingPercent = getTrackingPercent(timeline, currentStepIndex);
+                        const trackingHeadline = getTrackingHeadline(order, currentStep);
+
+                        return (
+                        <div key={order.id} className="order-card">
+                          <div className="order-header">
+                            <div className="order-id">Order #{order.id}</div>
+                            <div className="order-date">{order.date}</div>
+                            <span className={`order-status ${order.deliveryStatus.toLowerCase().replace(/\s+/g, '-')}`}>
+                              {order.deliveryStatus}
+                            </span>
+                          </div>
+
+                          <div className="order-meta-row">
+                            <span><strong>Rider:</strong> {order.riderName}</span>
+                            <span><strong>Last update:</strong> {order.updatedAt}</span>
+                            {isCompleted && order.deliveredAt && (
+                              <span><strong>Delivered:</strong> {order.deliveredAt}</span>
+                            )}
+                            {isCancelled && order.cancelledAt && (
+                              <span><strong>Cancelled:</strong> {order.cancelledAt}</span>
+                            )}
+                            {isCancelled && order.cancelReason && (
+                              <span><strong>Reason:</strong> {order.cancelReason}</span>
+                            )}
+                            {!isCompleted && !isCancelled && order.eta && (
+                              <span><strong>ETA:</strong> {order.eta}</span>
+                            )}
+                          </div>
+                          
+                          <div className="order-items">
+                            {order.items.map((item, idx) => (
+                              <div key={idx} className="order-item">
+                                <span>{item.name}</span>
+                                <span className="item-quantity">x{item.quantity}</span>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="order-total">
+                            <span>Total</span>
+                            <span className="total-amount">{order.total}</span>
+                          </div>
+
+                          <div className={`tracking-summary ${isCancelled ? 'cancelled' : ''}`}>
+                            <div className="tracking-summary-top">
+                              <span className="tracking-summary-label">{trackingHeadline}</span>
+                              <span className="tracking-summary-percent">{trackingPercent}%</span>
+                            </div>
+                            <div className="tracking-summary-bar">
+                              <div
+                                className="tracking-summary-fill"
+                                style={{ width: `${trackingPercent}%` }}
+                              />
+                            </div>
+                            <div className="tracking-summary-meta">
+                              <span><strong>Now:</strong> {currentStep}</span>
+                              {latestTrackingUpdate && (
+                                <span><strong>Latest update:</strong> {latestTrackingUpdate.time}</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {showTracking && (
+                            <div className="order-tracking">
+                              <div className="delivery-track-header">
+                                <h4>Track Your Delivery</h4>
+                                <div className="delivery-track-row">
+                                  <span><strong>ETA:</strong> {getTrackingEtaLabel(order)}</span>
+                                  <span><strong>Current:</strong> {currentStep}</span>
+                                </div>
+                              </div>
+
+                              <div className="delivery-rider-box">
+                                <div><strong>In-house Rider:</strong> {order.riderName || 'To be assigned'}</div>
+                                <div><strong>Contact:</strong> {order.riderContact || 'N/A'}</div>
+                                <div><strong>Vehicle:</strong> {order.riderVehicle || 'N/A'}</div>
+                                <div><strong>Location:</strong> {getTrackingLocation(order)}</div>
+                              </div>
+
+                              <div className="delivery-timeline">
+                                {(order.trackingUpdates || []).map((log, idx) => {
+                                  const isCurrentLog = idx === (order.trackingUpdates || []).length - 1;
+                                  const isLastLog = idx === (order.trackingUpdates || []).length - 1;
+                                  return (
+                                    <div
+                                      key={`${order.id}-log-${idx}`}
+                                      className={`delivery-timeline-item ${isCurrentLog ? 'current' : ''}`}
+                                    >
+                                      <div className="delivery-marker">
+                                        <span className="delivery-dot" />
+                                        {!isLastLog && <span className="delivery-line" />}
+                                      </div>
+                                      <div className="delivery-step-content">
+                                        <div className="delivery-step-title">{log.title}</div>
+                                        <div className="delivery-step-details">{log.details}</div>
+                                      </div>
+                                      <div className="delivery-step-time">{log.time}</div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="order-actions">
+                            <button className="btn-outline" onClick={() => toggleTracking(order.id)}>
+                              {showTracking ? 'Hide Tracking' : 'View Tracking'}
+                            </button>
+                            <button className="btn-secondary" onClick={() => handleReorder(order)}>
+                              Reorder
+                            </button>
+                          </div>
+                        </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <h3>No Orders Yet</h3>
+                      <p>Visit our shop to find great products for your pets!</p>
+                      <button className="btn-primary" onClick={() => navigate('/shop')}>
+                        Shop Now
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* REVIEWS TAB */}
+              {activeTab === 'reviews' && (
+                <div className="reviews-tab">
+                  <div className="reviews-header-row">
+                    <div>
+                      <h2 className="section-title">My Reviews</h2>
+                      <p className="section-subtitle">You've written {userReviews.length} review{userReviews.length !== 1 ? 's' : ''}</p>
+                    </div>
+                    <button
+                      className="btn-primary reviews-add-btn"
+                      onClick={() => {
+                        setShowReviewForm(false);
+                        setEditingReviewId(null);
+                        setShowReviewPicker((prev) => !prev);
+                      }}
+                    >
+                      {showReviewPicker ? 'Close' : 'Add New Review'}
+                    </button>
+                  </div>
+
+                  {!showReviewForm ? (
+                    <>
+                      {showReviewPicker && (
+                        <div className="review-picker-card">
+                          <h3 className="review-picker-title">Select Completed Booking</h3>
+                          {availableReviewBookings.length > 0 ? (
+                            <div className="review-picker-list">
+                              {availableReviewBookings.map((booking) => (
+                                <div key={booking.id} className="review-picker-item">
+                                  <div>
+                                    <div className="review-picker-service">{booking.service}</div>
+                                    <div className="review-picker-meta">
+                                      {booking.petName} - {booking.petBreed} - {booking.date}
+                                    </div>
+                                  </div>
+                                  <button className="btn-outline" onClick={() => handleLeaveReview(booking)}>
+                                    Write Review
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="review-picker-empty">No completed bookings available for new review.</p>
+                          )}
+                        </div>
+                      )}
+
+                      {userReviews.length > 0 ? (
+                        <div className="reviews-list">
+                          {userReviews.map(review => (
+                            <div key={review.id} className="review-card">
+                              <div className="review-header">
+                                <div>
+                                  <h3>{review.service}</h3>
+                                  <div className="review-meta">
+                                    <span>{review.petName} - {review.petBreed}</span>
+                                    <span className="review-date">{review.date}</span>
+                                  </div>
+                                </div>
+                                <div className="review-rating">
+                                  <span className="rating-stars">{'★'.repeat(review.rating)}</span>
+                                  <span className="rating-number">{review.rating}.0</span>
+                                </div>
+                              </div>
+                              <p className="review-comment">"{review.comment}"</p>
+                              <div className="review-actions">
+                                <button className="btn-outline" onClick={() => handleEditReview(review.id)}>
+                                  Edit
+                                </button>
+                                <button className="btn-outline-danger" onClick={() => handleDeleteReview(review.id)}>
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="empty-state">
+                          <h3>No Reviews Yet</h3>
+                          <p>Share your experience with the community!</p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="review-form">
+                      <div className="review-form-header">
+                        <h3>{editingReviewId ? 'Edit Review' : 'Write a Review'}</h3>
+                        <button className="close-btn" onClick={() => {
+                          setShowReviewForm(false);
+                          setEditingReviewId(null);
+                        }}>×</button>
+                      </div>
+
+                      <p className="review-service-info">
+                        How was your {selectedBooking?.service} experience?
+                      </p>
+
+                      <form onSubmit={handleSubmitReview}>
+                        <div className="rating-selector">
+                          <div className="stars">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <span
+                                key={star}
+                                className={`star ${star <= (hoverRating || reviewRating) ? 'active' : ''}`}
+                                onClick={() => setReviewRating(star)}
+                                onMouseEnter={() => setHoverRating(star)}
+                                onMouseLeave={() => setHoverRating(0)}
+                              >
+                                ★
+                              </span>
+                            ))}
+                          </div>
+                          <p className="rating-hint">Click to rate</p>
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="review">Your Review</label>
+                          <textarea
+                            id="review"
+                            rows="4"
+                            placeholder="Share your experience..."
+                            value={reviewText}
+                            onChange={(e) => setReviewText(e.target.value)}
+                          />
+                        </div>
+
+                        <div className="form-actions">
+                          <button type="submit" className="btn-primary btn-full">
+                            {editingReviewId ? 'Update' : 'Submit'} Review
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </div>
+              )}`r`n              {/* COMMUNITY TAB */}
+              {activeTab === 'community' && (
+                <div className="community-tab">
+                  <h2 className="section-title">Community Reviews</h2>
+                  <p className="section-subtitle">See what other pet parents are saying</p>
+                  
+                  <div className="community-stats">
+                    <div className="stat-card highlight">
+                      <div className="stat-large">{communityStats.averageRating}</div>
+                      <div className="stat-stars">★★★★★</div>
+                      <div className="stat-label">Average Rating</div>
+                      <div className="stat-count">{communityStats.totalReviews} reviews</div>
+                    </div>
+                    
+                    <div className="stat-card">
+                      <div className="stat-value">{communityStats.fiveStarCount}</div>
+                      <div className="stat-label">5-Star Reviews</div>
+                      <div className="stat-note">{communityStats.recommendedPercent}% recommend</div>
+                    </div>
+                    
+                    <div className="stat-card">
+                      <div className="stat-value">{communityStats.verifiedCount}</div>
+                      <div className="stat-label">Verified Reviews</div>
+                      <div className="stat-note">From real customers</div>
+                    </div>
+                  </div>
+
+                  <div className="rating-breakdown">
+                    <h3>Rating Breakdown</h3>
+                    <div className="rating-bars">
+                      {[5, 4, 3].map(stars => {
+                        const count = stars === 5 ? communityStats.fiveStarCount : 
+                                     stars === 4 ? communityStats.fourStarCount : 
+                                     communityStats.threeStarCount;
+                        const percentage = (count / communityStats.totalReviews) * 100;
+                        
+                        return (
+                          <div key={stars} className="rating-bar-item">
+                            <span className="bar-label">{stars} stars</span>
+                            <div className="bar-container">
+                              <div className="bar-fill" style={{ width: `${percentage}%` }} />
+                            </div>
+                            <span className="bar-count">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="reviews-by-service">
+                    <h3>Reviews by Service</h3>
+                    <div className="service-filters">
+                      {communityStats.reviewsByService.map((service, index) => (
+                        <button 
+                          key={index} 
+                          className={`service-filter ${selectedServiceFilter === service.service ? 'active' : ''}`}
+                          onClick={() => setSelectedServiceFilter(service.service)}
+                        >
+                          {service.service} ({service.count})
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="all-reviews">
+                    <h3>All Reviews</h3>
+                    {communityReviews
+                      .filter(review => selectedServiceFilter === 'All Services' || review.service === selectedServiceFilter)
+                      .map(review => (
+                        <div key={review.id} className="community-review">
+                          <div className="review-header">
+                            <div>
+                              <span className="review-author">{review.author}</span>
+                              <span className="review-service-badge">{review.service}</span>
+                              <span className="review-pet">{review.petBreed}</span>
+                            </div>
+                            <span className="review-date">{review.date}</span>
+                          </div>
+                          <div className="review-rating">
+                            <span className="rating-stars">{'★'.repeat(Math.floor(review.rating))}</span>
+                            <span className="rating-number">{review.rating}</span>
+                          </div>
+                          <p className="review-comment">"{review.comment}"</p>
+                          <div className="review-helpful">
+                            <button className="helpful-btn" onClick={() => handleHelpful(review.id)}>
+                              Helpful ({review.helpful})
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Profile;
+
+
+

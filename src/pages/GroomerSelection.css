@@ -1,0 +1,399 @@
+/* GroomerSelection.css */
+.ht-groomer-selection {
+  min-height: 100vh;
+  background-color: #fff2fa;
+  font-family: 'Inter', sans-serif;
+  padding-top: 40px;
+  padding-bottom: 60px;
+}
+
+.ht-groomer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ht-groomer-title-row {
+  margin-bottom: 30px;
+}
+
+.ht-groomer-main-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.ht-groomer-subtitle {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.ht-groomer-progress-row {
+  margin: 40px 0;
+}
+
+.ht-groomer-progress-steps {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ht-groomer-progress-bar {
+  height: 6px;
+  background-color: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ht-groomer-progress-bar .progress-bar {
+  background: linear-gradient(90deg, #f53799 0%, #ff6bc0 100%);
+}
+
+.ht-groomer-step-indicators {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-top: -22px;
+}
+
+.ht-groomer-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: default;
+  z-index: 2;
+  min-width: 100px;
+}
+
+.ht-groomer-step-clickable {
+  cursor: pointer;
+}
+
+.ht-groomer-step-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #7f8c8d;
+  margin-bottom: 12px;
+  border: 3px solid #e9ecef;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ht-groomer-step-active .ht-groomer-step-circle {
+  background: linear-gradient(135deg, #f53799, #ff6bc0);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(245, 55, 153, 0.4);
+  border-color: #f53799;
+}
+
+.ht-groomer-step-label {
+  font-weight: 600;
+  color: #7f8c8d;
+  font-size: 0.95rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.ht-groomer-step-active .ht-groomer-step-label {
+  color: #f53799;
+  font-weight: 700;
+}
+
+.ht-groomer-pet-summary {
+  background: linear-gradient(135deg, #fff2fa, #ffe9f5);
+  border-radius: 15px;
+  padding: 15px 20px;
+  margin-bottom: 30px;
+  border: 1px solid #ff6bc0;
+}
+
+.ht-groomer-pet-summary h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.ht-groomer-pet-summary p {
+  color: #f53799;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Groomers Grid - 2 columns for 6 groomers */
+.ht-groomer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.ht-groomer-card-item {
+  background-color: #fef9fb;
+  border-radius: 20px;
+  border: 2px solid #ffe4f1;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.ht-groomer-card-item:hover {
+  border-color: #ff6bc0;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(245, 55, 153, 0.15);
+}
+
+.ht-groomer-card-item.selected {
+  border-color: #f53799;
+  background: linear-gradient(135deg, #fff2fa, #ffe6f2);
+  box-shadow: 0 8px 20px rgba(245, 55, 153, 0.2);
+}
+
+.ht-groomer-image-container {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #ff6bc0;
+  margin: 0 auto 15px;
+}
+
+.ht-groomer-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ht-groomer-info {
+  text-align: center;
+}
+
+.ht-groomer-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.ht-groomer-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.ht-groomer-rating i {
+  color: #ffc107;
+  font-size: 0.9rem;
+}
+
+.ht-groomer-rating i.far.fa-star {
+  color: #ddd;
+}
+
+.ht-groomer-rating-value {
+  font-weight: 600;
+  color: #666;
+  margin-left: 5px;
+}
+
+.ht-groomer-specialty {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f53799;
+  margin-bottom: 10px;
+}
+
+.ht-groomer-details {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.ht-groomer-experience {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.ht-groomer-experience i {
+  color: #f53799;
+}
+
+.ht-groomer-bio {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.ht-groomer-languages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.ht-groomer-language-badge {
+  background-color: #fff2fa !important;
+  color: #f53799 !important;
+  border: 1px solid #ff6bc0 !important;
+  padding: 4px 10px !important;
+  font-weight: 500 !important;
+  font-size: 0.8rem !important;
+}
+
+.ht-groomer-selected-check {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #f53799;
+  font-size: 1.8rem;
+}
+
+/* Action Buttons - FIXED WIDTHS */
+.ht-groomer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #ffe4f1;
+}
+
+.ht-groomer-right-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.ht-groomer-back-btn {
+  border: 2px solid #6c757d !important;
+  color: #6c757d !important;
+  font-weight: 600 !important;
+  padding: 12px 30px !important;
+  border-radius: 10px !important;
+  min-width: 120px !important;
+  width: auto !important;
+}
+
+.ht-groomer-back-btn:hover {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+
+.ht-groomer-skip-btn {
+  border: 2px solid #ffc107 !important;
+  color: #856404 !important;
+  font-weight: 600 !important;
+  padding: 12px 25px !important;
+  border-radius: 10px !important;
+  background-color: #fff9e6 !important;
+  min-width: 160px !important;
+  width: auto !important;
+  white-space: nowrap !important;
+}
+
+.ht-groomer-skip-btn:hover {
+  background-color: #ffc107 !important;
+  color: white !important;
+}
+
+.ht-groomer-continue-btn {
+  background: linear-gradient(135deg, #f53799 0%, #ff6bc0 100%) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 12px 30px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 15px rgba(245, 55, 153, 0.3) !important;
+  min-width: 200px !important;
+  width: auto !important;
+  white-space: nowrap !important;
+}
+
+.ht-groomer-continue-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(245, 55, 153, 0.4) !important;
+}
+
+.ht-groomer-continue-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .ht-groomer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ht-groomer-main-title {
+    font-size: 2rem;
+  }
+  
+  .ht-groomer-step-label {
+    font-size: 0.8rem;
+  }
+  
+  .ht-groomer-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ht-groomer-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .ht-groomer-right-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+  
+  .ht-groomer-back-btn,
+  .ht-groomer-skip-btn,
+  .ht-groomer-continue-btn {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .ht-groomer-main-title {
+    font-size: 1.8rem;
+  }
+  
+  .ht-groomer-step-circle {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+  
+  .ht-groomer-step-indicators {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
