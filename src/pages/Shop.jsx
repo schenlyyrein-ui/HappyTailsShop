@@ -1178,31 +1178,6 @@ const Shop = () => {
           </div>
         </div>
 
-        {/* Pet Type Filter - FIXED BUTTON SIZES */}
-        <div className="happy-tails-pet-filter">
-          <h4>Filter by Pet Type:</h4>
-          <div className="happy-tails-pet-buttons">
-            <Button
-              className={`happy-tails-pet-btn ${selectedPetType === 'all' ? 'active' : ''}`}
-              onClick={() => setSelectedPetType('all')}
-            >
-              All Pets
-            </Button>
-            <Button
-              className={`happy-tails-pet-btn ${selectedPetType === 'dog' ? 'active' : ''}`}
-              onClick={() => setSelectedPetType('dog')}
-            >
-              <i className="fas fa-dog"></i> Dogs
-            </Button>
-            <Button
-              className={`happy-tails-pet-btn ${selectedPetType === 'cat' ? 'active' : ''}`}
-              onClick={() => setSelectedPetType('cat')}
-            >
-              <i className="fas fa-cat"></i> Cats
-            </Button>
-          </div>
-        </div>
-
         {/* Search and Sort Container */}
         <div className="happy-tails-search-sort-container">
           <div className="happy-tails-search-wrapper">
@@ -1224,6 +1199,18 @@ const Shop = () => {
             )}
           </div>
           
+          <div className="happy-tails-sort-wrapper">
+            <Form.Select
+              className="happy-tails-sort-select"
+              value={selectedPetType}
+              onChange={(e) => setSelectedPetType(e.target.value)}
+            >
+              <option value="all">Filter by</option>
+              <option value="dog">Dogs</option>
+              <option value="cat">Cats</option>
+            </Form.Select>
+          </div>
+
           <div className="happy-tails-sort-wrapper">
             <Form.Select 
               className="happy-tails-sort-select"

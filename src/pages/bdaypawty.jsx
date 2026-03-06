@@ -188,120 +188,19 @@ const BdayPawty = () => {
             {/* CONSUMABLES MENU CARD - Full width below inclusions */}
             <Col lg={12} className="bdaypawty-menu-col">
               <div className="bdaypawty-menu-card">
-                <h3 className="bdaypawty-menu-title">₱800 Consumables Menu</h3>
+                <h3 className="bdaypawty-menu-title">{'\u20B1'}800 Consumables Menu</h3>
                 <div className="bdaypawty-menu-content">
-                  {/* BEVERAGES SECTION */}
-                  <div className="bdaypawty-menu-category">
-                    <h4 className="bdaypawty-category-title">BEVERAGES</h4>
-                    
-                    <div className="bdaypawty-category-subsection">
-                      <h5 className="bdaypawty-subcategory-title">ICED COFFEE (16OZ)</h5>
-                      <div className="bdaypawty-menu-items">
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Americano</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(100)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Cafe Latte</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(120)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Caramel Macchiato</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(145)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Iced Matcha Latte</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(135)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Spanish Latte</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(140)}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bdaypawty-category-subsection">
-                      <h5 className="bdaypawty-subcategory-title">NON-CAFFEINE</h5>
-                      <div className="bdaypawty-menu-items">
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Four Seasons</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(90)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Hot Chocolate</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(110)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Iced Choco Milk</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(120)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Strawberry Milk</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(130)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Blueberry Soda</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(150)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* FOOD SECTION */}
-                  <div className="bdaypawty-menu-category">
-                    <h4 className="bdaypawty-category-title">FOOD</h4>
-                    
-                    <div className="bdaypawty-category-subsection">
-                      <h5 className="bdaypawty-subcategory-title">RICE MEALS</h5>
-                      <div className="bdaypawty-menu-items">
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Breaded Fish Fillet</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(140)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Burger Steak</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(150)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Chicken Cordon Bleu</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(160)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Chicken Fillet</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(170)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Hungarian Sausage</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(180)}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bdaypawty-category-subsection">
-                      <h5 className="bdaypawty-subcategory-title">SNACKS AND PASTA</h5>
-                      <div className="bdaypawty-menu-items">
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Baked Macaroni</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(190)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Chicken Alfredo</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(190)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Cheesy Beef Burger</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(190)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Chicken Popcorn</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(150)}</span>
-                        </div>
-                        <div className="bdaypawty-menu-item">
-                          <span className="bdaypawty-item-name">Fish and Fries</span>
-                          <span className="bdaypawty-item-price">{formatCurrency(200)}</span>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="bdaypawty-menu-images">
+                    <img
+                      src="/src/assets/menu1.jpg"
+                      alt="Consumables Menu 1"
+                      className="bdaypawty-menu-image"
+                    />
+                    <img
+                      src="/src/assets/menu2.jpg"
+                      alt="Consumables Menu 2"
+                      className="bdaypawty-menu-image"
+                    />
                   </div>
                 </div>
                 <button 
@@ -320,3 +219,4 @@ const BdayPawty = () => {
 };
 
 export default BdayPawty;
+

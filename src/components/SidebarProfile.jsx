@@ -9,12 +9,8 @@ const SidebarProfile = ({ activeTab, onTabChange, user, unreadCount, onLogout })
     onTabChange(tab);
   };
 
-  const handleHelp = () => {
-    navigate('/help');
-  };
-
   const handleSettings = () => {
-    navigate('/settings');
+    onTabChange('settings');
   };
 
   const handleLogout = () => {
@@ -82,21 +78,12 @@ const SidebarProfile = ({ activeTab, onTabChange, user, unreadCount, onLogout })
           <span className="nav-text">My Reviews</span>
         </button>
 
-        <button 
-          className={`nav-item ${activeTab === 'community' ? 'active' : ''}`}
-          onClick={() => handleNavigation('community')}
-        >
-          <span className="nav-text">Community</span>
-        </button>
       </nav>
 
       {/* Footer Actions */}
       <div className="sidebar-footer">
-        <button className="footer-btn" onClick={handleHelp}>
-          Help & Support
-        </button>
-        <button className="footer-btn" onClick={handleSettings}>
-          Settings
+        <button className={`footer-btn ${activeTab === 'settings' ? 'active' : ''}`} onClick={handleSettings}>
+          Account Settings
         </button>
         <button className="footer-btn logout" onClick={handleLogout}>
           Sign Out

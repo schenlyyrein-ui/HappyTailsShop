@@ -13,10 +13,40 @@ const Profile = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [selectedServiceFilter, setSelectedServiceFilter] = useState('All Services');
   const [orderFilter, setOrderFilter] = useState('all');
   const [expandedTracking, setExpandedTracking] = useState({});
   const [showReviewPicker, setShowReviewPicker] = useState(false);
+  const [user, setUser] = useState({
+    name: 'Sarah Chen',
+    email: 'sarah.chen@email.com',
+    phone: '+63 912 345 6789',
+    memberSince: '2023',
+    avatar: '/src/assets/user-avatar.jpg',
+    petCount: 3,
+    pets: [
+      { name: 'Bella', type: 'Golden Retriever' },
+      { name: 'Max', type: 'Shih Tzu' },
+      { name: 'Luna', type: 'Persian Cat' }
+    ]
+  });
+  const [settingsForm, setSettingsForm] = useState({
+    fullName: 'Sarah Chen',
+    username: 'sarahchen',
+    email: 'sarah.chen@email.com',
+    phone: '+63 912 345 6789',
+    address: '123 Makati Avenue',
+    city: 'Makati City',
+    bio: 'Pet parent of Bella, Max, and Luna.'
+  });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [settingsError, setSettingsError] = useState('');
+  const [settingsSuccess, setSettingsSuccess] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
   
   // Notifications state
   const [notifications, setNotifications] = useState([
@@ -49,21 +79,6 @@ const Profile = () => {
       read: true
     }
   ]);
-
-  // User data
-  const user = {
-    name: 'Sarah Chen',
-    email: 'sarah.chen@email.com',
-    phone: '+63 912 345 6789',
-    memberSince: '2023',
-    avatar: '/src/assets/user-avatar.jpg',
-    petCount: 3,
-    pets: [
-      { name: 'Bella', type: 'Golden Retriever' },
-      { name: 'Max', type: 'Shih Tzu' },
-      { name: 'Luna', type: 'Persian Cat' }
-    ]
-  };
 
   // Stats data
   const stats = {
@@ -301,49 +316,6 @@ const Profile = () => {
     }
   ]);
 
-  // Community reviews stats
-  const communityStats = {
-    averageRating: 4.7,
-    totalReviews: 10,
-    fiveStarCount: 7,
-    fourStarCount: 2,
-    threeStarCount: 1,
-    twoStarCount: 0,
-    oneStarCount: 0,
-    recommendedPercent: 70,
-    verifiedCount: 7,
-    reviewsByService: [
-      { service: 'All Services', count: 10 },
-      { service: 'Full Grooming Package', count: 4 },
-      { service: 'Pet Boarding', count: 2 },
-      { service: 'Pet Birthday Package', count: 2 },
-      { service: 'Pet Café Reservation', count: 2 }
-    ]
-  };
-
-  // Community reviews
-  const [communityReviews, setCommunityReviews] = useState([
-    {
-      id: 1,
-      author: 'Maria M.',
-      service: 'Full Grooming Package',
-      petBreed: 'Golden Retriever',
-      date: 'Dec 15, 2024',
-      rating: 5.0,
-      comment: 'Excellent service! Very professional and caring staff.',
-      helpful: 12
-    },
-    {
-      id: 2,
-      author: 'John D.',
-      service: 'Pet Boarding',
-      petBreed: 'Labrador',
-      date: 'Dec 12, 2024',
-      rating: 4.5,
-      comment: 'Great facility, my dog was well taken care of.',
-      helpful: 8
-    }
-  ]);
 
   // Navigation functions
   const handleReschedule = (bookingId) => {
@@ -486,13 +458,6 @@ const Profile = () => {
     }
   };
 
-  const handleHelpful = (reviewId) => {
-    setCommunityReviews(communityReviews.map(review =>
-      review.id === reviewId
-        ? { ...review, helpful: review.helpful + 1 }
-        : review
-    ));
-  };
 
   const markAllAsRead = () => {
     setNotifications(notifications.map(n => ({ ...n, read: true })));
@@ -608,6 +573,83 @@ const Profile = () => {
     }
   };
 
+  const handleSettingsChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setSettingsError('');
+    setSettingsSuccess('');
+    setSettingsForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSettingsSave = (e) => {
+    e.preventDefault();
+    const { fullName, email, phone } = settingsForm;
+
+    if (!fullName.trim() || !email.trim() || !phone.trim()) {
+      setSettingsError('Please complete Full Name, Email, and Phone.');
+      return;
+    }
+
+    setUser((prev) => ({
+      ...prev,
+      name: fullName,
+      email,
+      phone
+    }));
+
+    setSettingsError('');
+    setSettingsSuccess('Account settings updated successfully.');
+  };
+
+  const handleSettingsReset = () => {
+    setSettingsError('');
+    setSettingsSuccess('');
+    setSettingsForm((prev) => ({
+      ...prev,
+      fullName: user.name,
+      email: user.email,
+      phone: user.phone
+    }));
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordError('');
+    setPasswordSuccess('');
+    setPasswordForm((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePasswordSave = (e) => {
+    e.preventDefault();
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordError('Please complete all password fields.');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordError('New password must be at least 8 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New password and confirm password do not match.');
+      return;
+    }
+
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setPasswordError('');
+    setPasswordSuccess('Password updated successfully.');
+  };
+
   return (
     <div className="profile-page">
       {/* Main Content with Sidebar */}
@@ -635,9 +677,9 @@ const Profile = () => {
                   <span key={pet.name} className="pet-tag">
                     {pet.name} · {pet.type}
                   </span>
-                ))}
-              </div>
-            </div>
+	                ))}
+	              </div>
+	            </div>
           </div>
 
           <div className="profile-content-area">
@@ -645,64 +687,20 @@ const Profile = () => {
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="stat-number">{stats.upcoming}</div>
-                <div className="stat-label">Upcoming</div>
+                <div className="stat-label">Upcoming Bookings</div>
               </div>
               <div className="stat-card">
                 <div className="stat-number">{stats.completed}</div>
-                <div className="stat-label">Completed</div>
+                <div className="stat-label">Completed Bookings</div>
               </div>
               <div className="stat-card">
                 <div className="stat-number">{stats.orders}</div>
-                <div className="stat-label">Orders</div>
+                <div className="stat-label">Completed Orders</div>
               </div>
               <div className="stat-card">
                 <div className="stat-number">{stats.reviews}</div>
-                <div className="stat-label">Reviews</div>
+                <div className="stat-label">My Reviews</div>
               </div>
-            </div>
-
-            {/* Tab Navigation */}
-            <div className="tab-navigation">
-              <button 
-                className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-                onClick={() => setActiveTab('overview')}
-              >
-                Overview
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
-                onClick={() => setActiveTab('upcoming')}
-              >
-                Upcoming
-                {upcomingBookings.length > 0 && (
-                  <span className="tab-badge">{upcomingBookings.length}</span>
-                )}
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'past' ? 'active' : ''}`}
-                onClick={() => setActiveTab('past')}
-              >
-                Past
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
-                onClick={() => setActiveTab('orders')}
-              >
-                Orders
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
-                onClick={() => setActiveTab('reviews')}
-              >
-                Reviews
-                <span className="tab-badge">{userReviews.length}</span>
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'community' ? 'active' : ''}`}
-                onClick={() => setActiveTab('community')}
-              >
-                Community
-              </button>
             </div>
 
             {/* Tab Content */}
@@ -720,17 +718,9 @@ const Profile = () => {
             <div className="next-booking-service">{upcomingBookings[0].service}</div>
             <div className="next-booking-pet">{upcomingBookings[0].petName} · {upcomingBookings[0].petBreed}</div>
             <div className="next-booking-time">{upcomingBookings[0].date} at {upcomingBookings[0].time}</div>
-            <div className="next-booking-actions">
-              <button className="btn-secondary" onClick={() => handleViewServiceDetails(upcomingBookings[0])}>
-                View Details
-              </button>
-              <button className="btn-primary" onClick={() => handleReschedule(upcomingBookings[0].id)}>
-                Reschedule
-              </button>
-            </div>
           </div>
-        </div>
-      )}
+	                </div>
+	              )}
 
       {/* Recent Activity */}
       <div className="feature-card activity-main-card">
@@ -919,11 +909,11 @@ const Profile = () => {
                               <button className="btn-outline" onClick={() => handleLeaveReview(booking)}>
                                 Leave Review
                               </button>
-                            )}
-                          </div>
+			                  )}
+			                </div>
                         </div>
-                      ))}
-                    </div>
+	                      ))}
+	                    </div>
                   ) : (
                     <div className="empty-state">
                       <h3>No Past Bookings</h3>
@@ -1231,96 +1221,152 @@ const Profile = () => {
                     </div>
                   )}
                 </div>
-              )}`r`n              {/* COMMUNITY TAB */}
-              {activeTab === 'community' && (
-                <div className="community-tab">
-                  <h2 className="section-title">Community Reviews</h2>
-                  <p className="section-subtitle">See what other pet parents are saying</p>
-                  
-                  <div className="community-stats">
-                    <div className="stat-card highlight">
-                      <div className="stat-large">{communityStats.averageRating}</div>
-                      <div className="stat-stars">★★★★★</div>
-                      <div className="stat-label">Average Rating</div>
-                      <div className="stat-count">{communityStats.totalReviews} reviews</div>
-                    </div>
-                    
-                    <div className="stat-card">
-                      <div className="stat-value">{communityStats.fiveStarCount}</div>
-                      <div className="stat-label">5-Star Reviews</div>
-                      <div className="stat-note">{communityStats.recommendedPercent}% recommend</div>
-                    </div>
-                    
-                    <div className="stat-card">
-                      <div className="stat-value">{communityStats.verifiedCount}</div>
-                      <div className="stat-label">Verified Reviews</div>
-                      <div className="stat-note">From real customers</div>
-                    </div>
-                  </div>
+              )}
 
-                  <div className="rating-breakdown">
-                    <h3>Rating Breakdown</h3>
-                    <div className="rating-bars">
-                      {[5, 4, 3].map(stars => {
-                        const count = stars === 5 ? communityStats.fiveStarCount : 
-                                     stars === 4 ? communityStats.fourStarCount : 
-                                     communityStats.threeStarCount;
-                        const percentage = (count / communityStats.totalReviews) * 100;
-                        
-                        return (
-                          <div key={stars} className="rating-bar-item">
-                            <span className="bar-label">{stars} stars</span>
-                            <div className="bar-container">
-                              <div className="bar-fill" style={{ width: `${percentage}%` }} />
-                            </div>
-                            <span className="bar-count">{count}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+              {/* SETTINGS TAB */}
+              {activeTab === 'settings' && (
+                <div className="settings-tab">
+                  <h2 className="section-title">Account Settings</h2>
+                  <p className="section-subtitle">Manage your profile information and account preferences.</p>
 
-                  <div className="reviews-by-service">
-                    <h3>Reviews by Service</h3>
-                    <div className="service-filters">
-                      {communityStats.reviewsByService.map((service, index) => (
-                        <button 
-                          key={index} 
-                          className={`service-filter ${selectedServiceFilter === service.service ? 'active' : ''}`}
-                          onClick={() => setSelectedServiceFilter(service.service)}
-                        >
-                          {service.service} ({service.count})
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="all-reviews">
-                    <h3>All Reviews</h3>
-                    {communityReviews
-                      .filter(review => selectedServiceFilter === 'All Services' || review.service === selectedServiceFilter)
-                      .map(review => (
-                        <div key={review.id} className="community-review">
-                          <div className="review-header">
-                            <div>
-                              <span className="review-author">{review.author}</span>
-                              <span className="review-service-badge">{review.service}</span>
-                              <span className="review-pet">{review.petBreed}</span>
-                            </div>
-                            <span className="review-date">{review.date}</span>
-                          </div>
-                          <div className="review-rating">
-                            <span className="rating-stars">{'★'.repeat(Math.floor(review.rating))}</span>
-                            <span className="rating-number">{review.rating}</span>
-                          </div>
-                          <p className="review-comment">"{review.comment}"</p>
-                          <div className="review-helpful">
-                            <button className="helpful-btn" onClick={() => handleHelpful(review.id)}>
-                              Helpful ({review.helpful})
-                            </button>
-                          </div>
+                  <div className="feature-card">
+                    {settingsError && <p className="settings-error">{settingsError}</p>}
+                    {settingsSuccess && <p className="support-success">{settingsSuccess}</p>}
+                    <form className="settings-form" onSubmit={handleSettingsSave}>
+                      <h3 className="settings-section-title">Profile Information</h3>
+                      <div className="settings-grid">
+                        <div className="form-group">
+                          <label htmlFor="settings-fullName">Full Name</label>
+                          <input
+                            id="settings-fullName"
+                            type="text"
+                            name="fullName"
+                            value={settingsForm.fullName}
+                            onChange={handleSettingsChange}
+                          />
                         </div>
-                      ))}
+
+                        <div className="form-group">
+                          <label htmlFor="settings-username">Username</label>
+                          <input
+                            id="settings-username"
+                            type="text"
+                            name="username"
+                            value={settingsForm.username}
+                            onChange={handleSettingsChange}
+                          />
+                        </div>
+                      </div>
+
+                      <h3 className="settings-section-title">Contact Details</h3>
+                      <div className="settings-grid">
+                        <div className="form-group">
+                          <label htmlFor="settings-email">Email</label>
+                          <input
+                            id="settings-email"
+                            type="email"
+                            name="email"
+                            value={settingsForm.email}
+                            onChange={handleSettingsChange}
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="settings-phone">Phone</label>
+                          <input
+                            id="settings-phone"
+                            type="text"
+                            name="phone"
+                            value={settingsForm.phone}
+                            onChange={handleSettingsChange}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="settings-address">Address</label>
+                        <input
+                          id="settings-address"
+                          type="text"
+                          name="address"
+                          value={settingsForm.address}
+                          onChange={handleSettingsChange}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="settings-city">City</label>
+                        <input
+                          id="settings-city"
+                          type="text"
+                          name="city"
+                          value={settingsForm.city}
+                          onChange={handleSettingsChange}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="settings-bio">Bio</label>
+                        <textarea
+                          id="settings-bio"
+                          rows="3"
+                          name="bio"
+                          value={settingsForm.bio}
+                          onChange={handleSettingsChange}
+                        />
+                      </div>
+
+                      <div className="form-actions settings-actions">
+                        <button type="button" className="btn-outline" onClick={handleSettingsReset}>Reset</button>
+                        <button type="submit" className="btn-primary">Save Changes</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div className="feature-card mt-3">
+                    <h3 className="settings-section-title">Change Password</h3>
+                    {passwordError && <p className="settings-error">{passwordError}</p>}
+                    {passwordSuccess && <p className="support-success">{passwordSuccess}</p>}
+                    <form className="settings-form" onSubmit={handlePasswordSave}>
+                      <div className="settings-grid">
+                        <div className="form-group">
+                          <label htmlFor="settings-currentPassword">Current Password</label>
+                          <input
+                            id="settings-currentPassword"
+                            type="password"
+                            name="currentPassword"
+                            value={passwordForm.currentPassword}
+                            onChange={handlePasswordChange}
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="settings-newPassword">New Password</label>
+                          <input
+                            id="settings-newPassword"
+                            type="password"
+                            name="newPassword"
+                            value={passwordForm.newPassword}
+                            onChange={handlePasswordChange}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="settings-confirmPassword">Confirm New Password</label>
+                        <input
+                          id="settings-confirmPassword"
+                          type="password"
+                          name="confirmPassword"
+                          value={passwordForm.confirmPassword}
+                          onChange={handlePasswordChange}
+                        />
+                      </div>
+
+                      <div className="form-actions settings-actions">
+                        <button type="submit" className="btn-primary">Update Password</button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               )}
@@ -1333,6 +1379,8 @@ const Profile = () => {
 };
 
 export default Profile;
+
+
 
 
 

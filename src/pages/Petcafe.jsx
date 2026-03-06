@@ -20,6 +20,7 @@ const Petcafe = () => {
   } = useCart();
   
   const [activeCategory, setActiveCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const [cartVisible, setCartVisible] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState({});
 
@@ -268,8 +269,12 @@ const Petcafe = () => {
     if (activeCategory !== 'all') {
       filtered = filtered.filter(item => item.category === activeCategory);
     }
+    if (searchTerm.trim()) {
+      const keyword = searchTerm.toLowerCase();
+      filtered = filtered.filter(item => item.name.toLowerCase().includes(keyword));
+    }
     setFilteredItems(filtered);
-  }, [activeCategory]);
+  }, [activeCategory, searchTerm]);
 
   const handleCategoryClick = (categoryId) => setActiveCategory(categoryId);
 
@@ -315,7 +320,7 @@ const Petcafe = () => {
         <div className="petcafe-hero-content">
           <div className="petcafe-hero-container">
             <div className="petcafe-hero-text-section">
-              <h1 className="petcafe-hero-title">Pet Cafe</h1>
+              <h1 className="petcafe-hero-title">Pet Menu</h1>
               <p className="petcafe-hero-subtitle">
                 More than just a café—it's a paws-itive space where pets can munch, sip,
                 and wag their tails in a cozy, feel-good atmosphere.
@@ -351,19 +356,37 @@ const Petcafe = () => {
             </ToastContainer>
           </div>
 
-          {/* Categories */}
+          {/* Search + Filter */}
           <div className="petcafe-categories-container">
-            <h2 className="petcafe-categories-title">Our Pet Menu</h2>
-            <div className="petcafe-categories">
-              {categories.map(cat => (
-                <Button
-                  key={cat.id}
-                  className={`petcafe-category-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                  onClick={() => handleCategoryClick(cat.id)}
+            <div className="petcafe-filter-intro">
+              <h3>Find your pet's next favorite treat</h3>
+              <p>Search by menu name or quickly narrow results using the dropdown filter.</p>
+            </div>
+            <div className="petcafe-filter-row">
+              <div className="petcafe-filter-field">
+                <input
+                  id="petcafe-search"
+                  type="text"
+                  className="petcafe-search-input"
+                  placeholder="Search pet menu..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="petcafe-filter-field">
+                <select
+                  id="petcafe-category"
+                  className="petcafe-filter-select"
+                  value={activeCategory}
+                  onChange={(e) => handleCategoryClick(e.target.value)}
                 >
-                  {cat.name}
-                </Button>
-              ))}
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -450,7 +473,7 @@ const Petcafe = () => {
               })
             ) : (
               <div className="petcafe-no-results">
-                <p>No menu items found in this category. Try a different filter.</p>
+                <p>No menu items found. Try another search or filter.</p>
               </div>
             )}
           </div>

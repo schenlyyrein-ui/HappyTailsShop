@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, ProgressBar } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, ProgressBar, Form } from 'react-bootstrap';
 import './BookingConfirmation.css';
 
 const BookingConfirmation = () => {
@@ -17,6 +17,7 @@ const BookingConfirmation = () => {
     totalPrice: 0,
     groomer: null
   });
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   // Format currency helper
   const formatCurrency = (amount) => {
@@ -293,6 +294,11 @@ const BookingConfirmation = () => {
   const handleConfirmBooking = (e) => {
     if (e) {
       e.preventDefault();
+    }
+
+    if (!acceptedTerms) {
+      alert('Please agree to the Terms and Conditions first.');
+      return;
     }
     
     console.log('Confirming booking:', bookingData);
@@ -577,6 +583,24 @@ const BookingConfirmation = () => {
                   </div>
                 </div>
 
+                <div className="mt-4">
+                  <h5>Terms and Conditions</h5>
+                  <div className="alert alert-light border">
+                    <p className="mb-1">1. A confirmed schedule is required before grooming starts.</p>
+                    <p className="mb-1">2. Pets must be fit for grooming and any health concerns must be disclosed.</p>
+                    <p className="mb-1">3. Late arrivals may be shortened, rescheduled, or treated as walk-in.</p>
+                    <p className="mb-1">4. Final charges may vary based on coat condition, behavior, and add-on services.</p>
+                    <p className="mb-0">5. Happy Tails may refuse or stop service if safety requirements are not met.</p>
+                  </div>
+                  <Form.Check
+                    type="checkbox"
+                    id="grooming-terms"
+                    label="I have read and agree to the Terms and Conditions."
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  />
+                </div>
+
                 <div className="ht-confirmation-button-container">
                   <div className="ht-confirmation-buttons">
                     <Button 
@@ -592,6 +616,7 @@ const BookingConfirmation = () => {
                       onClick={handleConfirmBooking}
                       className="ht-confirmation-confirm-btn"
                       type="button"
+                      disabled={!acceptedTerms}
                     >
                       Confirm Booking
                     </Button>

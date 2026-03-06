@@ -603,6 +603,13 @@ body {
   margin-bottom: 16px;
 }
 
+/* Keep Date and Paid rows aligned in booking cards */
+.booking-card .booking-datetime,
+.booking-card .booking-price {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
 .price-label {
   font-size: 14px;
   color: var(--gray-500);
@@ -1560,6 +1567,92 @@ body {
   color: var(--pink-primary);
 }
 
+/* ========== HELP / SETTINGS ========== */
+.settings-form .form-group {
+  margin-bottom: 14px;
+}
+
+.settings-section-title {
+  margin: 8px 0 12px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--gray-800);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.settings-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-700);
+}
+
+.settings-form input,
+.settings-form select,
+.settings-form textarea {
+  width: 100%;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--border-radius-md);
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--gray-800);
+  background: var(--white);
+}
+
+.settings-form input:focus,
+.settings-form select:focus,
+.settings-form textarea:focus {
+  outline: none;
+  border-color: var(--pink-primary);
+  box-shadow: 0 0 0 3px rgba(245, 55, 153, 0.15);
+}
+
+.settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.settings-checkbox input {
+  width: 16px;
+  height: 16px;
+}
+
+.support-success {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: var(--border-radius-md);
+  background: var(--green-light);
+  color: #166534;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.settings-error {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: var(--border-radius-md);
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.settings-actions {
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 /* ========== EMPTY STATE ========== */
 .empty-state {
   text-align: center;
@@ -1591,6 +1684,10 @@ body {
   
   .overview-grid {
     gap: 16px;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
   }
 }
 

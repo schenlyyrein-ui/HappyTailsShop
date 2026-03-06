@@ -286,6 +286,74 @@
   padding: 30px;
 }
 
+.petcafe-filter-intro {
+  max-width: 760px;
+  margin: 0 auto 16px;
+}
+
+.petcafe-filter-intro h3 {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #2f2f2f;
+}
+
+.petcafe-filter-intro p {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #666;
+}
+
+.petcafe-filter-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4a4a4a;
+}
+
+.petcafe-filter-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto 24px;
+}
+
+.petcafe-filter-field {
+  text-align: left;
+}
+
+.petcafe-search-input {
+  width: 100%;
+  border: 2px solid #f7b7da;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.petcafe-search-input:focus,
+.petcafe-filter-select:focus {
+  border-color: #f53799;
+  box-shadow: 0 0 0 3px rgba(245, 55, 153, 0.15);
+}
+
+.petcafe-filter-select {
+  width: 100%;
+  border: 2px solid #f7b7da;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  color: #333;
+  background-color: #fff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
 .petcafe-categories-title {
   color: #333;
   margin-bottom: 25px;
@@ -618,28 +686,33 @@
 .petcafe-cart-quantity {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 10px;
 }
 
 .petcafe-cart-quantity-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50% !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  height: 36px !important;
+  border-radius: 999px !important;
   background-color: #f53799 !important;
   border: none !important;
   color: white !important;
-  font-size: 1rem !important;
-  display: flex;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   padding: 0 !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.2s ease !important;
+  flex: 0 0 42px !important;
 }
 
 .petcafe-cart-quantity-btn:hover {
   background-color: #d42c87 !important;
-  transform: scale(1.1);
+  transform: translateY(-1px) !important;
 }
 
 .petcafe-cart-quantity-value {
@@ -705,15 +778,25 @@
   background-color: white !important;
   display: flex;
   justify-content: space-between;
+  align-items: stretch;
+  gap: 12px;
 }
 
 .petcafe-continue-shopping {
   background-color: #6c757d !important;
   border: none !important;
   color: white !important;
-  padding: 8px 20px !important;
-  border-radius: 8px !important;
+  padding: 9px 16px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
   transition: all 0.3s ease !important;
+  flex: 1;
+  min-height: 50px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
 }
 
 .petcafe-continue-shopping:hover {
@@ -724,10 +807,17 @@
   background-color: #f53799 !important;
   border: none !important;
   color: white !important;
-  padding: 10px 25px !important;
-  border-radius: 8px !important;
-  font-weight: 500 !important;
+  padding: 9px 16px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
   transition: all 0.3s ease !important;
+  flex: 1;
+  min-height: 50px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
 }
 
 .petcafe-checkout-btn:hover {
@@ -750,9 +840,10 @@
   background-color: #dc3545 !important;
   border: none !important;
   color: white !important;
-  padding: 5px 12px !important;
-  border-radius: 6px !important;
-  font-size: 0.8rem !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
   transition: all 0.3s ease !important;
   white-space: nowrap;
 }
@@ -868,18 +959,32 @@
     padding: 30px 20px;
   }
   
-  .petcafe-categories {
+  .petcafe-filter-row {
+    grid-template-columns: 1fr;
     gap: 10px;
-  }
-  
-  .petcafe-category-btn {
-    padding: 10px 20px !important;
-    font-size: 1rem !important;
-    min-width: 140px;
+    margin-bottom: 20px;
   }
   
   .petcafe-categories-title {
     font-size: 1.8rem;
+  }
+
+  .petcafe-filter-intro h3 {
+    font-size: 1.2rem;
+  }
+
+  .petcafe-filter-intro p {
+    font-size: 0.92rem;
+  }
+  
+  .petcafe-search-input {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+
+  .petcafe-filter-select {
+    padding: 10px 12px;
+    font-size: 0.95rem;
   }
   
   .petcafe-categories-container {
@@ -935,11 +1040,13 @@
   .petcafe-categories-title {
     font-size: 1.5rem;
   }
-  
-  .petcafe-category-btn {
-    min-width: 120px;
-    padding: 8px 15px !important;
-    font-size: 0.9rem !important;
+
+  .petcafe-filter-intro h3 {
+    font-size: 1.08rem;
+  }
+
+  .petcafe-filter-row {
+    margin-bottom: 14px;
   }
   
   .petcafe-menu-grid {

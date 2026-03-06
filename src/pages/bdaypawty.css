@@ -445,6 +445,23 @@
   margin-right: auto !important;
 }
 
+.bdaypawty-menu-images {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.bdaypawty-menu-image {
+  width: calc(50% - 10px);
+  max-width: 380px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  object-fit: cover;
+}
+
 .bdaypawty-menu-category {
   margin-bottom: 30px;
 }
@@ -701,6 +718,11 @@
     padding: 16px;
     font-size: 15px;
     max-width: 300px;
+  }
+
+  .bdaypawty-menu-image {
+    width: 100%;
+    max-width: 100%;
   }
 }
 

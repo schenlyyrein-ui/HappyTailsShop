@@ -6,6 +6,32 @@ import './Home.css';
 
 const Home = () => {
   const navigate = useNavigate();
+  const communityReviews = [
+    {
+      id: 1,
+      name: 'Sarah Chen',
+      review: 'Super bait ng staff and very maingat sila sa grooming ni Bella. Babalik kami ulit.',
+      service: 'Grooming Service',
+      rating: '5.0/5',
+      stars: 5
+    },
+    {
+      id: 2,
+      name: 'Miguel Santos',
+      review: 'Malinis yung boarding area and may updates ako na-receive habang naka-check in si Max.',
+      service: 'Pet Boarding',
+      rating: '5.0/5',
+      stars: 5
+    },
+    {
+      id: 3,
+      name: 'Alyssa Rivera',
+      review: 'Ang dali mag order sa shop at mabilis dumating. Quality din yung products.',
+      service: 'Shop Order',
+      rating: '4.9/5',
+      stars: 5
+    }
+  ];
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -142,7 +168,7 @@ const Home = () => {
             <Col lg={4} md={6} className="mb-4">
               <div className="home-service-card">
                 <div className="home-service-content">
-                  <h3 className="home-service-title">PET HOTEL</h3>
+                  <h3 className="home-service-title">BOARDING</h3>
                   <p className="home-service-description">Daycare & overnight boarding</p>
                   <Button 
                     className="home-service-btn home-hotel-btn"
@@ -433,13 +459,68 @@ const Home = () => {
                   >
                     <div className="home-self-service-btn-overlay"></div>
                     <div className="home-self-service-btn-content">
-                      <span className="home-self-service-btn-text">Pet Cafe Menu</span>
+                      <span className="home-self-service-btn-text">Pet Menu</span>
                     </div>
                   </div>
                 </div>
               </Col>
             </Row>
           </div>
+        </Container>
+      </section>
+
+      {/* Community Reviews Section */}
+      <section className="home-community-reviews-section">
+        <Container>
+          <div className="home-community-reviews-shell">
+            <div className="home-community-reviews-header">
+              <h2>Community Reviews</h2>
+              <p>Real experiences from Happy Tails customers</p>
+            </div>
+
+            <Row className="home-community-stats">
+              <Col md={4} className="mb-3 mb-md-0">
+                <div className="home-community-stat">
+                  <strong>4.9/5</strong>
+                  <span>Average Rating</span>
+                </div>
+              </Col>
+              <Col md={4} className="mb-3 mb-md-0">
+                <div className="home-community-stat">
+                  <strong>1,200+</strong>
+                  <span>Customers</span>
+                </div>
+              </Col>
+              <Col md={4}>
+                <div className="home-community-stat">
+                  <strong>98%</strong>
+                  <span>Would Recommend</span>
+                </div>
+              </Col>
+            </Row>
+          </div>
+
+          <Row className="mt-4">
+            {communityReviews.map((item) => (
+              <Col lg={4} md={6} className="mb-4" key={item.id}>
+                <div className="home-community-review-card">
+                  <div className="home-community-review-top">
+                    <div className="home-community-reviewer">
+                      <div className="home-community-avatar">{item.name.charAt(0)}</div>
+                      <div>
+                        <h3>{item.name}</h3>
+                        <p>{item.service}</p>
+                      </div>
+                    </div>
+                    <span>{item.rating}</span>
+                  </div>
+
+                  <div className="home-community-stars">{'★'.repeat(item.stars)}</div>
+                  <p className="home-community-review-text">{item.review}</p>
+                </div>
+              </Col>
+            ))}
+          </Row>
         </Container>
       </section>
     </div>

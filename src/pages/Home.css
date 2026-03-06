@@ -15,6 +15,14 @@
   padding-top: 0;
 }
 
+/* Homepage-only override: remove wrapper gap above hero */
+.home-main-page .homepage-navbar-wrapper {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-bottom: none !important;
+  background: transparent !important;
+}
+
 /* ==================== HERO SECTION WITH BACKGROUND IMAGE ==================== */
 .home-hero-section {
   position: relative;
@@ -1286,6 +1294,174 @@
   
   .home-self-service-card p {
     font-size: 16px;
+  }
+}
+
+/* ==================== FOOTER ==================== */
+.home-community-reviews-section {
+  padding: 95px 0;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(245, 55, 153, 0.12), transparent 35%),
+    radial-gradient(circle at 85% 90%, rgba(58, 228, 250, 0.16), transparent 32%),
+    #fff;
+}
+
+.home-community-reviews-shell {
+  background: #ffffff;
+  border: 1px solid #ffd9ea;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 20px 45px rgba(245, 55, 153, 0.08);
+}
+
+.home-community-reviews-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.home-community-reviews-header h2 {
+  font-size: 40px;
+  font-weight: 900;
+  color: #1f2d3d;
+  margin-bottom: 8px;
+  letter-spacing: 0.6px;
+}
+
+.home-community-reviews-header p {
+  font-size: 17px;
+  color: #5b6775;
+  margin: 0;
+}
+
+.home-community-stats {
+  margin-top: 12px;
+}
+
+.home-community-stat {
+  background: #fff7fc;
+  border: 1px solid #ffd9ea;
+  border-radius: 16px;
+  padding: 16px 14px;
+  text-align: center;
+}
+
+.home-community-stat strong {
+  display: block;
+  font-size: 28px;
+  color: #f53799;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.home-community-stat span {
+  font-size: 13px;
+  color: #5b6775;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.home-community-review-card {
+  background: #fff;
+  border: 1px solid #ffd9ea;
+  border-radius: 20px;
+  padding: 24px;
+  height: 100%;
+  box-shadow: 0 14px 30px rgba(21, 35, 56, 0.08);
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.home-community-review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 36px rgba(21, 35, 56, 0.12);
+}
+
+.home-community-review-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.home-community-reviewer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-community-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f53799, #ff6b9d);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.home-community-review-top h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1f2d3d;
+  line-height: 1.1;
+}
+
+.home-community-review-top p {
+  margin: 3px 0 0;
+  color: #6a7480;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.home-community-review-top span {
+  background: #f4f7fb;
+  color: #1f2d3d;
+  border: 1px solid #d8e2ef;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.home-community-stars {
+  color: #ffbf33;
+  font-size: 18px;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.home-community-review-text {
+  color: #3f4c5a;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .home-community-reviews-section {
+    padding: 70px 0;
+  }
+
+  .home-community-reviews-shell {
+    padding: 22px 16px;
+  }
+
+  .home-community-reviews-header h2 {
+    font-size: 30px;
+  }
+
+  .home-community-reviews-header p {
+    font-size: 16px;
+  }
+
+  .home-community-stat strong {
+    font-size: 24px;
   }
 }
 

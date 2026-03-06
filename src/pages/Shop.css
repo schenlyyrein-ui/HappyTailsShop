@@ -185,6 +185,12 @@
   font-size: 1.1rem;
 }
 
+.happy-tails-pet-type-wrapper {
+  min-width: 180px;
+  max-width: 220px;
+  margin: 0 auto;
+}
+
 .happy-tails-pet-buttons {
   display: flex;
   justify-content: center;
@@ -950,28 +956,33 @@
 .happy-tails-cart-quantity {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 10px;
 }
 
 .happy-tails-cart-quantity-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50% !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  height: 36px !important;
+  border-radius: 999px !important;
   background-color: #f53799 !important;
   border: none !important;
   color: white !important;
-  font-size: 1rem !important;
-  display: flex;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   padding: 0 !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.2s ease !important;
+  flex: 0 0 42px !important;
 }
 
 .happy-tails-cart-quantity-btn:hover {
   background-color: #d32f82 !important;
-  transform: scale(1.1);
+  transform: translateY(-1px) !important;
 }
 
 .happy-tails-cart-quantity-value {
@@ -1004,9 +1015,10 @@
   background-color: #dc3545 !important;
   border: none !important;
   color: white !important;
-  padding: 5px 12px !important;
-  border-radius: 6px !important;
-  font-size: 0.8rem !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
   transition: all 0.3s ease !important;
   white-space: nowrap;
 }
@@ -1057,15 +1069,25 @@
   background-color: white !important;
   display: flex;
   justify-content: space-between;
+  align-items: stretch;
+  gap: 12px;
 }
 
 .happy-tails-continue-shopping {
   background-color: #6c757d !important;
   border: none !important;
   color: white !important;
-  padding: 8px 20px !important;
-  border-radius: 8px !important;
+  padding: 9px 16px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
   transition: all 0.3s ease !important;
+  flex: 1;
+  min-height: 50px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
 }
 
 .happy-tails-continue-shopping:hover {
@@ -1076,10 +1098,17 @@
   background-color: #f53799 !important;
   border: none !important;
   color: white !important;
-  padding: 10px 25px !important;
-  border-radius: 8px !important;
-  font-weight: 500 !important;
+  padding: 9px 16px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
   transition: all 0.3s ease !important;
+  flex: 1;
+  min-height: 50px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
 }
 
 .happy-tails-checkout-btn:hover {

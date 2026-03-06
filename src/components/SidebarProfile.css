@@ -207,6 +207,12 @@
   box-shadow: var(--shadow-sm);
 }
 
+.footer-btn.active {
+  background: var(--pink-primary);
+  color: var(--white);
+  box-shadow: var(--shadow-pink);
+}
+
 .footer-btn.logout {
   color: #ef4444;
 }
