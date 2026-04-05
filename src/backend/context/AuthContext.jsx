@@ -217,6 +217,41 @@ export function AuthProvider({ children }) {
         if (error) throw new Error(error.message);
       },
 
+      async requestPasswordReset(email) {
+        if (!supabase) {
+          throw new Error("Supabase is not configured. Update your .env file.");
+        }
+
+        const nextEmail = String(email || "").trim();
+        if (!nextEmail) {
+          throw new Error("Email is required.");
+        }
+
+        const redirectTo =
+          typeof window !== "undefined" && window.location?.origin
+            ? `${window.location.origin}/reset-password`
+            : undefined;
+
+        const { error } = await supabase.auth.resetPasswordForEmail(nextEmail, {
+          redirectTo,
+        });
+        if (error) throw new Error(error.message);
+      },
+
+      async resetPassword(newPassword) {
+        if (!supabase) {
+          throw new Error("Supabase is not configured. Update your .env file.");
+        }
+
+        const nextPassword = String(newPassword || "");
+        if (nextPassword.length < 8) {
+          throw new Error("Password must be at least 8 characters.");
+        }
+
+        const { error } = await supabase.auth.updateUser({ password: nextPassword });
+        if (error) throw new Error(error.message);
+      },
+
       async logout() {
         if (!supabase) {
           throw new Error("Supabase is not configured. Update your .env file.");

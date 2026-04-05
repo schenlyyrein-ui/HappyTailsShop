@@ -217,6 +217,12 @@ const HappyTails2 = () => {
     setIsLoginOpen(false);
   };
 
+  const handleForgotPassword = () => {
+    setIsLoginOpen(false);
+    setIsMobileMenuOpen(false);
+    navigate('/forgot-password');
+  };
+
   const handleDropdownItemClick = (path) => {
     setIsServicesDropdownOpen(false);
     setIsMobileMenuOpen(false);
@@ -423,6 +429,13 @@ const HappyTails2 = () => {
                                 />
                                 Remember me
                               </label>
+                              <button
+                                type="button"
+                                className="ht2-forgot-password-btn"
+                                onClick={handleForgotPassword}
+                              >
+                                Forgot password?
+                              </button>
                             </div>
 
                             <button type="submit" className="ht2-submit-btn ht2-login-submit">

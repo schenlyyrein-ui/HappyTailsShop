@@ -13,6 +13,8 @@ import AppointmentConfirmed from './pages/AppointmentConfirmed';
 import Shop from './pages/Shop';
 import Checkout from './pages/Checkout';
 import Boarding from './pages/Boarding';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Add Bootstrap CSS
 import BoardingBook from './pages/BoardingBook';
@@ -50,6 +52,8 @@ function App() {
           <main className="main-content flex-grow-1">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/grooming" element={<Grooming />} />
               <Route path="/boarding" element={<Boarding />} />
               <Route

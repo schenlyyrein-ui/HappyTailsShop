@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Modal, Form, Button, Alert, Spinner } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { useAuth } from "../backend/context/AuthContext";
 import "./AuthModal.css";
 
@@ -155,6 +156,12 @@ const AuthModal = ({ show, onClose, onSuccess }) => {
                 className="ht-auth-remember"
               />
             </Form.Group>
+
+            <div className="mb-3 text-end">
+              <Link to="/forgot-password" className="ht-auth-link">
+                Forgot password?
+              </Link>
+            </div>
 
             <Button
               type="submit"

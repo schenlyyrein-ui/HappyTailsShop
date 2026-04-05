@@ -52,12 +52,8 @@ const Profile = () => {
     phone: '',
     memberSince: '2023',
     avatar: '/src/assets/user-avatar.jpg',
-    petCount: 3,
-    pets: [
-      { name: 'Bella', type: 'Golden Retriever' },
-      { name: 'Max', type: 'Shih Tzu' },
-      { name: 'Luna', type: 'Persian Cat' }
-    ]
+    petCount: 0,
+    pets: []
   });
   const [settingsForm, setSettingsForm] = useState({
     fullName: '',
@@ -116,255 +112,17 @@ const Profile = () => {
   }, [authLoading, authUser, authProfile]);
   
   // Notifications state
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: 'Appointment Tomorrow!',
-      message: "Bella's grooming appointment is tomorrow at 10:00 AM",
-      time: '2 hours ago',
-      read: false
-    },
-    {
-      id: 2,
-      title: 'Booking Confirmed',
-      message: 'Your Pet Café reservation for Dec 25 has been confirmed',
-      time: '1 day ago',
-      read: false
-    },
-    {
-      id: 3,
-      title: 'Rate Your Experience',
-      message: "How was Max's birthday party? Leave a review!",
-      time: '3 days ago',
-      read: false
-    },
-    {
-      id: 4,
-      title: 'Order Completed',
-      message: 'We delivered your order on 2024-01-01',
-      time: '5 days ago',
-      read: true
-    }
-  ]);
+  const [notifications, setNotifications] = useState([]);
 
   // Upcoming bookings
-  const [upcomingBookings, setUpcomingBookings] = useState([
-    {
-      id: 1,
-      service: 'Full Grooming Package',
-      serviceType: 'grooming',
-      petName: 'Bella',
-      petBreed: 'Golden Retriever',
-      date: 'Dec 20, 2024',
-      time: '10:00 AM',
-      status: 'Processing',
-      price: '₱850 - ₱1,200',
-      note: '*Price may vary depending on pet size/condition'
-    },
-    {
-      id: 2,
-      service: 'Pet Boarding',
-      serviceType: 'boarding',
-      petName: 'Max',
-      petBreed: 'Shih Tzu',
-      date: 'Dec 22, 2024',
-      time: '9:00 AM',
-      status: 'Processing',
-      price: '₱500/night',
-      note: '* Price may vary depending on pet size/condition'
-    },
-    {
-      id: 3,
-      service: 'Pet Café Reservation',
-      serviceType: 'petcafe',
-      petName: 'Luna',
-      petBreed: 'Persian Cat',
-      date: 'Dec 25, 2024',
-      time: '2:00 PM',
-      status: 'Processing',
-      price: '₱299 entry',
-      note: '* Price may vary depending on pet size/condition'
-    }
-  ]);
+  const [upcomingBookings, setUpcomingBookings] = useState([]);
 
   // Past bookings
-  const [pastBookings, setPastBookings] = useState([
-    {
-      id: 4,
-      service: 'Full Grooming Package',
-      serviceType: 'grooming',
-      petName: 'Bella',
-      petBreed: 'Golden Retriever',
-      date: 'Dec 5, 2024',
-      time: '11:00 AM',
-      status: 'Completed',
-      price: '₱950',
-      rating: 4,
-      reviewed: true
-    },
-    {
-      id: 5,
-      service: 'Pet Birthday Package',
-      serviceType: 'bdaypawty',
-      petName: 'Max',
-      petBreed: 'Shih Tzu',
-      date: 'Nov 28, 2024',
-      time: '2:00 PM',
-      status: 'Completed',
-      price: '₱2,500',
-      rating: 3,
-      reviewed: true
-    },
-    {
-      id: 6,
-      service: 'Pet Café Visit',
-      serviceType: 'petcafe',
-      petName: 'Luna',
-      petBreed: 'Persian Cat',
-      date: 'Nov 20, 2024',
-      time: '3:00 PM',
-      status: 'Completed',
-      price: '₱299',
-      rating: 4,
-      reviewed: true
-    }
-  ]);
+  const [pastBookings, setPastBookings] = useState([]);
   // Order history
-  const [orderHistory, setOrderHistory] = useState([
-    {
-      id: 'ORD-2024-001',
-      date: 'Dec 15, 2024',
-      items: [
-        { name: 'Premium Dog Food (5kg)', quantity: 1 },
-        { name: 'Chew Toys Set', quantity: 1 }
-      ],
-      total: 'PHP 1,450',
-      status: 'Paid',
-      deliveryStatus: 'Completed',
-      riderName: 'Rider Paolo',
-      riderContact: '0917-555-1122',
-      riderVehicle: 'Motorbike • HT-217',
-      updatedAt: 'Dec 16, 2024 11:15 AM',
-      deliveredAt: 'Dec 16, 2024 10:48 AM',
-      trackingUpdates: [
-        { time: 'Dec 15, 2024 8:02 PM', title: 'Order Placed', details: 'Your order was received.' },
-        { time: 'Dec 15, 2024 8:15 PM', title: 'Payment Confirmed', details: 'Payment was confirmed.' },
-        { time: 'Dec 15, 2024 9:05 PM', title: 'Preparing Order', details: 'Items are packed and ready for dispatch.' },
-        { time: 'Dec 16, 2024 9:20 AM', title: 'Out for Delivery', details: 'Rider Paolo is on the way.' },
-        { time: 'Dec 16, 2024 10:48 AM', title: 'Delivered', details: 'Order has been delivered successfully.' }
-      ]
-    },
-    {
-      id: 'ORD-2024-002',
-      date: 'Dec 10, 2024',
-      items: [
-        { name: 'Cat Litter (10L)', quantity: 1 },
-        { name: 'Scratching Post', quantity: 1 }
-      ],
-      total: 'PHP 890',
-      status: 'Paid',
-      deliveryStatus: 'Completed',
-      riderName: 'Rider Mia',
-      riderContact: '0917-555-2244',
-      riderVehicle: 'Scooter • HT-184',
-      updatedAt: 'Dec 11, 2024 7:32 PM',
-      deliveredAt: 'Dec 11, 2024 7:05 PM',
-      trackingUpdates: [
-        { time: 'Dec 10, 2024 1:11 PM', title: 'Order Placed', details: 'Your order was received.' },
-        { time: 'Dec 10, 2024 1:18 PM', title: 'Payment Confirmed', details: 'Payment was confirmed.' },
-        { time: 'Dec 10, 2024 2:03 PM', title: 'Preparing Order', details: 'Items are packed and ready for dispatch.' },
-        { time: 'Dec 11, 2024 5:42 PM', title: 'Out for Delivery', details: 'Rider Mia is delivering your order.' },
-        { time: 'Dec 11, 2024 7:05 PM', title: 'Delivered', details: 'Order has been delivered successfully.' }
-      ]
-    },
-    {
-      id: 'ORD-2024-003',
-      date: 'Dec 18, 2024',
-      items: [
-        { name: 'Pet Shampoo', quantity: 1 },
-        { name: 'Grooming Brush', quantity: 1 },
-        { name: 'Nail Clipper', quantity: 1 }
-      ],
-      total: 'PHP 650',
-      status: 'Pending',
-      deliveryStatus: 'Processing',
-      riderName: 'Rider Carlo',
-      riderContact: '0917-555-7788',
-      riderVehicle: 'Motorbike • HT-305',
-      updatedAt: 'Dec 18, 2024 2:20 PM',
-      eta: 'Dec 19, 2024 3:00 PM',
-      trackingUpdates: [
-        { time: 'Dec 18, 2024 12:06 PM', title: 'Order Placed', details: 'Your order was received.' },
-        { time: 'Dec 18, 2024 12:20 PM', title: 'Payment Confirmed', details: 'Waiting for rider assignment.' },
-        { time: 'Dec 18, 2024 2:20 PM', title: 'Preparing Order', details: 'We are packing your items now.' }
-      ]
-    },
-    {
-      id: 'ORD-2024-004',
-      date: 'Dec 19, 2024',
-      items: [
-        { name: 'Dog Vitamins', quantity: 1 },
-        { name: 'Dental Chews', quantity: 2 }
-      ],
-      total: 'PHP 780',
-      status: 'Paid',
-      deliveryStatus: 'Out for Delivery',
-      riderName: 'Rider Bea',
-      riderContact: '0917-555-9011',
-      riderVehicle: 'Motorbike • HT-412',
-      updatedAt: 'Dec 19, 2024 10:05 AM',
-      eta: 'Dec 19, 2024 12:00 PM',
-      trackingUpdates: [
-        { time: 'Dec 19, 2024 7:40 AM', title: 'Order Placed', details: 'Your order was received.' },
-        { time: 'Dec 19, 2024 7:51 AM', title: 'Payment Confirmed', details: 'Payment was confirmed.' },
-        { time: 'Dec 19, 2024 8:33 AM', title: 'Preparing Order', details: 'Items are packed and ready for dispatch.' },
-        { time: 'Dec 19, 2024 10:05 AM', title: 'Out for Delivery', details: 'Rider Bea is heading to your location.' }
-      ]
-    },
-    {
-      id: 'ORD-2024-005',
-      date: 'Dec 21, 2024',
-      items: [
-        { name: 'Pet Wipes', quantity: 2 },
-        { name: 'Pee Pads', quantity: 1 }
-      ],
-      total: 'PHP 540',
-      status: 'Refunded',
-      deliveryStatus: 'Cancelled',
-      riderName: 'Not assigned',
-      updatedAt: 'Dec 21, 2024 3:10 PM',
-      cancelledAt: 'Dec 21, 2024 3:10 PM',
-      cancelledStage: 'Preparing Order',
-      cancelReason: 'Customer requested cancellation',
-      trackingUpdates: [
-        { time: 'Dec 21, 2024 1:35 PM', title: 'Order Placed', details: 'Your order was received.' },
-        { time: 'Dec 21, 2024 1:39 PM', title: 'Payment Confirmed', details: 'Payment was confirmed.' },
-        { time: 'Dec 21, 2024 2:26 PM', title: 'Preparing Order', details: 'Items were being packed.' },
-        { time: 'Dec 21, 2024 3:10 PM', title: 'Cancelled', details: 'Customer requested cancellation.' }
-      ]
-    }
-  ]);
+  const [orderHistory, setOrderHistory] = useState([]);
   // User reviews
-  const [userReviews, setUserReviews] = useState([
-    {
-      id: 1,
-      service: 'Full Grooming Package',
-      petName: 'Bella',
-      petBreed: 'Golden Retriever',
-      date: 'Dec 5, 2024',
-      rating: 5,
-      comment: 'Amazing service! Bella came out looking like a superstar. The groomers were so gentle and patient with her.'
-    },
-    {
-      id: 2,
-      service: 'Pet Café Visit',
-      petName: 'Luna',
-      petBreed: 'Persian Cat',
-      date: 'Nov 20, 2024',
-      rating: 5,
-      comment: 'Great atmosphere and the staff was very welcoming. Luna loved the cat-friendly treats!'
-    }
-  ]);
+  const [userReviews, setUserReviews] = useState([]);
 
   const completedOrders = useMemo(
     () => orderHistory.filter((order) => (order.deliveryStatus || '').toLowerCase() === 'completed'),
@@ -1730,6 +1488,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
 
 
 

@@ -414,9 +414,10 @@
 /* Remember me checkbox */
 .ht2-remember-forgot {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
+  gap: 12px;
 }
 
 .ht2-checkbox-label {
@@ -432,6 +433,21 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
+}
+
+.ht2-forgot-password-btn {
+  background: none;
+  border: none;
+  color: #f53799;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ht2-forgot-password-btn:hover {
+  color: #d42a7d;
+  text-decoration: underline;
 }
 
 /* Submit buttons - Make them more prominent */
