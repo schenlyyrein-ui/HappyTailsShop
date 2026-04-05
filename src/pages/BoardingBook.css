@@ -172,6 +172,26 @@
   margin-bottom: 40px;
 }
 
+.ht-boarding-empty-state {
+  background: #fff8fd;
+  border: 2px dashed #ffb7dc;
+  border-radius: 18px;
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.ht-boarding-empty-text {
+  margin: 0 0 16px 0;
+  color: #5f5f5f;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.ht-boarding-alert {
+  margin-bottom: 22px;
+}
+
 .ht-boarding-pet-item {
   background-color: white;
   border-radius: 20px;

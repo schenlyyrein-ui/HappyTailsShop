@@ -78,6 +78,7 @@ function emptyPetForm(ownerDefaults) {
 
 function mapRowToPet(row, ownerDefaults) {
   const details = parsePetNotes(row.notes);
+  const rowBirthday = row.birth_date ? String(row.birth_date).slice(0, 10) : '';
   return {
     id: row.id,
     name: row.name || 'Pet',
@@ -85,7 +86,7 @@ function mapRowToPet(row, ownerDefaults) {
     size: normalizePetSize(details.size),
     breed: row.breed || 'Unknown breed',
     age: details.age || '',
-    birthday: details.birthday || '',
+    birthday: details.birthday || rowBirthday,
     parentName: details.parentName || ownerDefaults.parentName || '',
     parentPhone: details.parentPhone || ownerDefaults.parentPhone || '',
     parentEmail: details.parentEmail || ownerDefaults.parentEmail || '',
@@ -131,7 +132,7 @@ const BookAppointment = () => {
 
     const { data, error } = await supabase
       .from('user_pets')
-      .select('id, name, species, breed, notes, created_at')
+      .select('id, name, species, breed, birth_date, notes, created_at')
       .eq('user_id', authUser.id)
       .order('created_at', { ascending: true });
 
@@ -211,6 +212,7 @@ const BookAppointment = () => {
       name: petForm.name.trim(),
       species: normalizePetType(petForm.type).toLowerCase(),
       breed: petForm.breed.trim(),
+      birth_date: petForm.birthday || null,
       notes: serializePetNotes(petForm),
       updated_at: new Date().toISOString(),
     };
@@ -221,7 +223,7 @@ const BookAppointment = () => {
         .update(payload)
         .eq('id', editingPet.id)
         .eq('user_id', authUser.id)
-        .select('id, name, species, breed, notes, created_at')
+        .select('id, name, species, breed, birth_date, notes, created_at')
         .single();
 
       if (error) {
@@ -241,7 +243,7 @@ const BookAppointment = () => {
     const { data, error } = await supabase
       .from('user_pets')
       .insert(payload)
-      .select('id, name, species, breed, notes, created_at')
+      .select('id, name, species, breed, birth_date, notes, created_at')
       .single();
 
     if (error) {

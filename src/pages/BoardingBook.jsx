@@ -1,10 +1,37 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, ProgressBar, Form, Modal } from 'react-bootstrap';
+import { useEffect } from 'react';
+import { Alert, Container, Row, Col, Card, Button, ProgressBar, Form, Modal } from 'react-bootstrap';
+import { useAuth } from '../backend/context/AuthContext';
+import { supabase } from '../backend/supabaseClient';
 import './BoardingBook.css';
+
+const parsePetNotes = (value) => {
+  if (!value || typeof value !== 'string') return {};
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch (_error) {
+    return {};
+  }
+};
+
+const normalizePetType = (value) => {
+  const text = String(value || '').toLowerCase();
+  if (text.includes('cat')) return 'Cat';
+  return 'Dog';
+};
+
+const normalizePetSize = (value) => {
+  const text = String(value || '').trim();
+  if (text === 'Small' || text === 'Medium' || text === 'Large' || text === 'XL') return text;
+  if (text === 'ExtraLarge') return 'XL';
+  return 'Medium';
+};
 
 const BoardingBook = () => {
   const navigate = useNavigate();
+  const { user: authUser, profile } = useAuth();
   const [activeStep, setActiveStep] = useState(1);
   const steps = ['Information', 'Service Details', 'Confirmation'];
   const timeOptions = [
@@ -15,36 +42,9 @@ const BoardingBook = () => {
     { value: '18:00', label: '6:00 PM' },
   ];
   
-  const [pets, setPets] = useState([
-    { 
-      id: 1, 
-      name: 'Belona', 
-      type: 'Dog', 
-      size: 'Medium', 
-      breed: 'Shih Tzu', 
-      age: '2 years',
-      birthday: '',
-      selected: true,
-      parentName: 'Thea Coleen Jose',
-      parentPhone: '09123456789',
-      parentEmail: 'theajose@email.com',
-      parentAddress: 'N/A'
-    },
-    { 
-      id: 2, 
-      name: 'Baloney', 
-      type: 'Cat', 
-      size: 'Small', 
-      breed: 'Persian', 
-      age: '3 years',
-      birthday: '',
-      selected: false,
-      parentName: 'Thea Coleen Jose',
-      parentPhone: '09123456789',
-      parentEmail: 'theajose@email.com',
-      parentAddress: 'N/A'
-    }
-  ]);
+  const [pets, setPets] = useState([]);
+  const [isLoadingPets, setIsLoadingPets] = useState(true);
+  const [petsError, setPetsError] = useState('');
 
   const [serviceType, setServiceType] = useState('');
   const [checkInDate, setCheckInDate] = useState('');
@@ -56,6 +56,9 @@ const BoardingBook = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSavingPet, setIsSavingPet] = useState(false);
+  const [isDeletingPet, setIsDeletingPet] = useState(false);
+  const [modalError, setModalError] = useState('');
   
   const [petForm, setPetForm] = useState({
     name: '',
@@ -78,19 +81,93 @@ const BoardingBook = () => {
     { value: 'XL', label: 'XL (31kg & up)' }
   ];
 
+  const ownerDefaults = {
+    parentName: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ').trim(),
+    parentPhone: profile?.phone || '',
+    parentEmail: authUser?.email || '',
+    parentAddress: '',
+  };
+
+  const mapRowToPet = (row) => {
+    const details = parsePetNotes(row.notes);
+    const rowBirthday = row.birth_date ? String(row.birth_date).slice(0, 10) : '';
+
+    return {
+      id: row.id,
+      name: row.name || 'Pet',
+      type: normalizePetType(row.species),
+      size: normalizePetSize(details.size),
+      breed: row.breed || 'Unknown breed',
+      age: details.age || '',
+      birthday: details.birthday || rowBirthday,
+      selected: false,
+      parentName: details.parentName || ownerDefaults.parentName || '',
+      parentPhone: details.parentPhone || ownerDefaults.parentPhone || '',
+      parentEmail: details.parentEmail || ownerDefaults.parentEmail || '',
+      parentAddress: details.parentAddress || ownerDefaults.parentAddress || '',
+    };
+  };
+
+  const serializePetNotes = (form) => JSON.stringify({
+    size: form.size || 'Medium',
+    age: form.age?.trim() || '',
+    birthday: form.birthday || '',
+    parentName: form.parentName?.trim() || '',
+    parentPhone: form.parentPhone?.trim() || '',
+    parentEmail: form.parentEmail?.trim() || '',
+    parentAddress: form.parentAddress?.trim() || '',
+  });
+
+  useEffect(() => {
+    const loadPets = async () => {
+      if (!supabase || !authUser?.id) {
+        setPets([]);
+        setIsLoadingPets(false);
+        return;
+      }
+
+      setIsLoadingPets(true);
+      setPetsError('');
+
+      const { data, error } = await supabase
+        .from('user_pets')
+        .select('id, name, species, breed, birth_date, notes, created_at')
+        .eq('user_id', authUser.id)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        setPets([]);
+        setPetsError(error.message || 'Could not load pets right now.');
+        setIsLoadingPets(false);
+        return;
+      }
+
+      const loadedPets = Array.isArray(data) ? data.map(mapRowToPet) : [];
+      const nextPets = loadedPets.map((pet, index) => ({
+        ...pet,
+        selected: index === 0,
+      }));
+
+      setPets(nextPets);
+      setIsLoadingPets(false);
+    };
+
+    void loadPets();
+  }, [authUser?.email, authUser?.id, profile?.first_name, profile?.last_name, profile?.phone]);
+
   const serviceTypes = [
     { 
       type: 'DAYCARE', 
       duration: '3 hours', 
       description: 'Includes water, supervised playtime, and photo and video updates during your pet\'s stay.',
-      price: 'â‚±409.00 â€¢ Medium',
+      price: 'PHP 409.00 - Medium',
       additionalInfo: 'P50.00 per hour for every succeeding hour'
     },
     { 
       type: 'OVERNIGHT', 
       duration: '24 hours', 
       description: 'Includes a dedicated 24/7 pet attendant, water, and regular photo and video updates for fur parents.',
-      price: 'â‚±409.00 â€¢ Medium',
+      price: 'PHP 409.00 - Medium',
       additionalInfo: 'P50.00 per hour for every succeeding hour'
     }
   ];
@@ -98,6 +175,7 @@ const BoardingBook = () => {
   const handleAddPet = () => {
     setIsEditing(false);
     setEditingPet(null);
+    setModalError('');
     setPetForm({
       name: '',
       type: 'Dog',
@@ -105,10 +183,10 @@ const BoardingBook = () => {
       breed: '',
       age: '',
       birthday: '',
-      parentName: '',
-      parentPhone: '',
-      parentEmail: '',
-      parentAddress: ''
+      parentName: ownerDefaults.parentName || '',
+      parentPhone: ownerDefaults.parentPhone || '',
+      parentEmail: ownerDefaults.parentEmail || '',
+      parentAddress: ownerDefaults.parentAddress || ''
     });
     setShowModal(true);
   };
@@ -116,6 +194,7 @@ const BoardingBook = () => {
   const handleEditPet = (pet) => {
     setIsEditing(true);
     setEditingPet(pet);
+    setModalError('');
     setPetForm({ ...pet });
     setShowModal(true);
   };
@@ -136,29 +215,99 @@ const BoardingBook = () => {
     }));
   };
 
-  const handleSavePet = () => {
-    if (isEditing && editingPet) {
-      const updatedPets = pets.map(pet => 
-        pet.id === editingPet.id ? { ...petForm, id: editingPet.id, selected: pet.selected } : pet
-      );
-      setPets(updatedPets);
-    } else {
-      const newPet = {
-        ...petForm,
-        id: pets.length + 1,
-        selected: false
-      };
-      setPets([...pets.map(p => ({ ...p, selected: false })), newPet]);
+  const handleSavePet = async () => {
+    if (!supabase || !authUser?.id) return;
+    if (!petForm.name || !petForm.breed || !petForm.age || !petForm.parentName || !petForm.parentPhone || !petForm.parentEmail) {
+      return;
     }
+
+    setIsSavingPet(true);
+    setModalError('');
+
+    const payload = {
+      user_id: authUser.id,
+      name: petForm.name.trim(),
+      species: normalizePetType(petForm.type).toLowerCase(),
+      breed: petForm.breed.trim(),
+      birth_date: petForm.birthday || null,
+      notes: serializePetNotes(petForm),
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isEditing && editingPet?.id) {
+      const { data, error } = await supabase
+        .from('user_pets')
+        .update(payload)
+        .eq('id', editingPet.id)
+        .eq('user_id', authUser.id)
+        .select('id, name, species, breed, birth_date, notes, created_at')
+        .single();
+
+      if (error) {
+        setModalError(error.message || 'Could not update this pet.');
+        setIsSavingPet(false);
+        return;
+      }
+
+      const updatedPet = mapRowToPet(data);
+      setPets((prev) => prev.map((pet) => (
+        pet.id === editingPet.id
+          ? { ...updatedPet, selected: pet.selected }
+          : pet
+      )));
+      setIsSavingPet(false);
+      setShowModal(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('user_pets')
+      .insert(payload)
+      .select('id, name, species, breed, birth_date, notes, created_at')
+      .single();
+
+    if (error) {
+      setModalError(error.message || 'Could not save this pet.');
+      setIsSavingPet(false);
+      return;
+    }
+
+    const newPet = mapRowToPet(data);
+    setPets((prev) => [
+      ...prev.map((pet) => ({ ...pet, selected: false })),
+      { ...newPet, selected: true },
+    ]);
+    setIsSavingPet(false);
     setShowModal(false);
   };
 
-  const handleDeletePet = () => {
-    if (editingPet && pets.length > 1) {
-      const updatedPets = pets.filter(pet => pet.id !== editingPet.id);
-      setPets(updatedPets);
-      setShowModal(false);
+  const handleDeletePet = async () => {
+    if (!supabase || !authUser?.id || !editingPet?.id) return;
+
+    setIsDeletingPet(true);
+    setModalError('');
+
+    const { error } = await supabase
+      .from('user_pets')
+      .delete()
+      .eq('id', editingPet.id)
+      .eq('user_id', authUser.id);
+
+    if (error) {
+      setModalError(error.message || 'Could not delete this pet.');
+      setIsDeletingPet(false);
+      return;
     }
+
+    setPets((prev) => {
+      const remaining = prev.filter((pet) => pet.id !== editingPet.id);
+      if (remaining.length === 0) return [];
+      if (remaining.some((pet) => pet.selected)) return remaining;
+      return remaining.map((pet, index) => ({ ...pet, selected: index === 0 }));
+    });
+
+    setIsDeletingPet(false);
+    setShowModal(false);
   };
 
   const handleStepClick = (stepNumber) => {
@@ -235,6 +384,7 @@ const BoardingBook = () => {
   };
 
   const handleBack = () => {
+    setModalError('');
     setShowModal(false);
   };
 
@@ -296,45 +446,70 @@ const BoardingBook = () => {
                     Who will be staying with us?
                   </Card.Title>
                   
-                  <div className="ht-boarding-pets-grid">
-                    {pets.map(pet => (
-                      <div 
-                        key={pet.id} 
-                        className={`ht-boarding-pet-item ${pet.selected ? 'ht-boarding-pet-selected' : ''}`}
-                        onClick={() => handleSelectPet(pet.id)}
-                      >
-                        <div className={`ht-boarding-pet-avatar ht-boarding-pet-${pet.type.toLowerCase()}`}>
-                          {pet.type.charAt(0)}
-                        </div>
-                        <div className="ht-boarding-pet-info">
-                          <h5 className="ht-boarding-pet-name">{pet.name}</h5>
-                          <p className="ht-boarding-pet-details">{pet.breed} â€¢ {pet.size} Size â€¢ {pet.age}</p>
-                          <p className="ht-boarding-pet-parent">Owner: {pet.parentName}</p>
-                        </div>
-                        {pet.selected && <div className="ht-boarding-pet-checkmark">âœ“</div>}
-                        <button 
-                          className="ht-boarding-pet-edit-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditPet(pet);
-                          }}
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    ))}
-                    
-                    <div 
-                      className="ht-boarding-pet-item ht-boarding-add-pet"
-                      onClick={handleAddPet}
-                    >
-                      <div className="ht-boarding-add-pet-icon">+</div>
-                      <div className="ht-boarding-add-pet-text">Add another pet</div>
+                  {petsError && (
+                    <Alert variant="danger" className="ht-boarding-alert">
+                      {petsError}
+                    </Alert>
+                  )}
+
+                  {isLoadingPets ? (
+                    <div className="ht-boarding-empty-state">
+                      <p className="ht-boarding-empty-text">Loading your pets...</p>
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      {pets.length === 0 ? (
+                        <div className="ht-boarding-empty-state">
+                          <p className="ht-boarding-empty-text">Add your first pet to continue with boarding.</p>
+                          <Button className="ht-boarding-continue-btn" onClick={handleAddPet}>
+                            Add your first pet
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="ht-boarding-pets-grid">
+                          {pets.map(pet => (
+                            <div 
+                              key={pet.id} 
+                              className={`ht-boarding-pet-item ${pet.selected ? 'ht-boarding-pet-selected' : ''}`}
+                              onClick={() => handleSelectPet(pet.id)}
+                            >
+                              <div className={`ht-boarding-pet-avatar ht-boarding-pet-${pet.type.toLowerCase()}`}>
+                                {pet.type.charAt(0)}
+                              </div>
+                              <div className="ht-boarding-pet-info">
+                                <h5 className="ht-boarding-pet-name">{pet.name}</h5>
+                                <p className="ht-boarding-pet-details">{pet.breed} - {pet.size} Size - {pet.age || 'Age not set'}</p>
+                                <p className="ht-boarding-pet-parent">Owner: {pet.parentName || ownerDefaults.parentName || 'Not provided'}</p>
+                              </div>
+                              {pet.selected && <div className="ht-boarding-pet-checkmark">&#10003;</div>}
+                              <button 
+                                type="button"
+                                className="ht-boarding-pet-edit-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditPet(pet);
+                                }}
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          ))}
+                          
+                          <button 
+                            type="button"
+                            className="ht-boarding-pet-item ht-boarding-add-pet"
+                            onClick={handleAddPet}
+                          >
+                            <div className="ht-boarding-add-pet-icon">+</div>
+                            <div className="ht-boarding-add-pet-text">Add another pet</div>
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
                   
                   <div className="ht-boarding-continue-container">
-                    <Button className="ht-boarding-continue-btn" onClick={handleContinue}>
+                    <Button className="ht-boarding-continue-btn" onClick={handleContinue} disabled={isLoadingPets || pets.filter(pet => pet.selected).length === 0}>
                       Continue to Service Details
                     </Button>
                   </div>
@@ -374,7 +549,7 @@ const BoardingBook = () => {
                           <span className="ht-boarding-service-additional">{service.additionalInfo}</span>
                         </div>
                         {serviceType === service.type && (
-                          <div className="ht-boarding-service-checkmark">âœ“</div>
+                          <div className="ht-boarding-service-checkmark">&#10003;</div>
                         )}
                       </div>
                     ))}
@@ -502,6 +677,12 @@ const BoardingBook = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="ht-boarding-modal-body">
+          {modalError && (
+            <Alert variant="danger" className="mb-3">
+              {modalError}
+            </Alert>
+          )}
+
           <div className="ht-boarding-form-section">
             <h4 className="ht-boarding-form-title">Pet Information</h4>
             <Row>
@@ -658,9 +839,9 @@ const BoardingBook = () => {
                 variant="outline-danger" 
                 onClick={handleDeletePet}
                 className="ht-boarding-delete-btn"
-                disabled={pets.length <= 1}
+                disabled={isDeletingPet}
               >
-                Delete Pet
+                {isDeletingPet ? 'Deleting...' : 'Delete Pet'}
               </Button>
             )}
             <div className="ht-boarding-modal-buttons">
@@ -668,17 +849,18 @@ const BoardingBook = () => {
                 variant="outline-secondary" 
                 onClick={handleBack}
                 className="ht-boarding-back-modal-btn"
+                disabled={isSavingPet || isDeletingPet}
               >
                 Back
               </Button>
               <Button 
                 variant="primary" 
-                onClick={handleSavePet}
+                onClick={() => void handleSavePet()}
                 className="ht-boarding-save-btn"
-                disabled={!petForm.name || !petForm.breed || !petForm.age || 
+                disabled={isSavingPet || isDeletingPet || !petForm.name || !petForm.breed || !petForm.age || 
                          !petForm.parentName || !petForm.parentPhone || !petForm.parentEmail}
               >
-                {isEditing ? 'Update Pet Info' : 'Save Pet Info'}
+                {isSavingPet ? 'Saving...' : isEditing ? 'Update Pet Info' : 'Save Pet Info'}
               </Button>
             </div>
           </div>
@@ -689,3 +871,4 @@ const BoardingBook = () => {
 };
 
 export default BoardingBook;
+

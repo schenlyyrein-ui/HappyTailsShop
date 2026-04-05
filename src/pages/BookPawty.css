@@ -281,6 +281,27 @@
   margin-bottom: 40px;
 }
 
+.ht-pawty-empty-state {
+  grid-column: 1 / -1;
+  border: 2px dashed #ffb3da;
+  border-radius: 18px;
+  background-color: #fff9fc;
+  padding: 24px;
+  text-align: center;
+}
+
+.ht-pawty-empty-text {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ht-pawty-empty-alert {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
 .ht-pawty-pet-item {
   background-color: white;
   border-radius: 20px;
@@ -668,6 +689,7 @@
   min-height: 160px;
   text-align: center;
   cursor: pointer;
+  position: relative;
 }
 
 .ht-pawty-photo-upload-title {
@@ -1114,6 +1136,44 @@
 
 .ht-pawty-proof-upload {
   margin-bottom: 25px;
+}
+
+.ht-pawty-gcash-section {
+  margin-bottom: 18px;
+  padding: 18px;
+  background-color: #fff2fa;
+  border-radius: 12px;
+  border-left: 4px solid #f53799;
+}
+
+.ht-pawty-gcash-qr-card {
+  background: #fff9fc;
+  border: 2px solid #ffd4ea;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.ht-pawty-gcash-qr-title {
+  color: #c51f75;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.ht-pawty-gcash-qr-image {
+  width: min(100%, 280px);
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid #f6c7df;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(245, 55, 153, 0.12);
+}
+
+.ht-pawty-gcash-qr-note {
+  color: #7a6a73;
+  font-size: 0.92rem;
+  margin: 12px 0 0;
 }
 
 .ht-pawty-upload-area {

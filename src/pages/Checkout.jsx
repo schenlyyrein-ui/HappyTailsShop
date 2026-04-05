@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Container, Row, Col, Form, Button, Card, Alert, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../backend/context/AuthContext';
+import { createProfileOrder } from '../backend/services/profileDataService';
 import { DEFAULT_FULFILLMENT, SHIPPING_OPTIONS, getShippingFee } from '../constants/fulfillment';
 import gcashQr from '../assets/gcashqr.jpg';
 import './Shop.css';
@@ -13,6 +15,7 @@ const formatCurrency = (amount) => `PHP ${Number(amount || 0).toFixed(2)}`;
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const { user: authUser } = useAuth();
   const { cart, clearCart, getCartTotal, checkoutPreferences, updateCheckoutPreferences } = useCart();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -29,6 +32,8 @@ const Checkout = () => {
   const [proofOfPayment, setProofOfPayment] = useState(null);
   const [proofFileName, setProofFileName] = useState('');
   const [orderComplete, setOrderComplete] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmedOrderNumber, setConfirmedOrderNumber] = useState('');
 
   const cartInsights = useMemo(() => {
     const hasPetMenu = cart.some((item) => PET_MENU_CATEGORIES.has(item.category));
@@ -74,7 +79,7 @@ const Checkout = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (cart.length === 0) {
@@ -104,23 +109,95 @@ const Checkout = () => {
       return;
     }
 
-    console.log('Order submitted:', {
-      customer: formData,
-      cart,
-      subtotal,
-      shippingFee,
-      total,
-      proofOfPayment: proofOfPayment
-        ? {
-            name: proofFileName,
-            size: proofOfPayment.size,
-            type: proofOfPayment.type
-          }
-        : null
-    });
+    if (!authUser?.id) {
+      alert('Please log in first so your order appears in your profile history.');
+      return;
+    }
 
-    setOrderComplete(true);
-    clearCart();
+    setIsSubmitting(true);
+
+    try {
+      const orderNumber = `ORD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+      const orderedAt = new Date().toISOString();
+      const eta = formData.fulfillmentMethod === 'delivery'
+        ? new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString()
+        : null;
+
+      const items = cart.map((item) => ({
+        productId: item.id,
+        name: item.name,
+        variantId: item.variantId || null,
+        variantName: item.variantName || null,
+        quantity: Number(item.quantity || 0),
+        unitPrice: Number(item.price || 0),
+        subtotal: Number(item.price || 0) * Number(item.quantity || 0),
+      }));
+
+      const trackingUpdates = [
+        {
+          time: new Date(orderedAt).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+          }),
+          title: 'Order Placed',
+          details: 'Your order was received.',
+        },
+        {
+          time: new Date(orderedAt).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+          }),
+          title: formData.paymentMethod === 'gcash' ? 'Payment Confirmed' : 'Payment Pending',
+          details: formData.paymentMethod === 'gcash'
+            ? 'GCash proof submitted. Waiting for verification.'
+            : 'Cash payment selected. Please pay upon handoff/pickup.',
+        },
+        {
+          time: new Date(orderedAt).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+          }),
+          title: 'Preparing Order',
+          details: formData.fulfillmentMethod === 'pickup'
+            ? 'Your order is being prepared for pickup.'
+            : 'Your order is being prepared for delivery.',
+        },
+      ];
+
+      const savedOrder = await createProfileOrder(authUser.id, {
+        orderNumber,
+        orderedAt,
+        items,
+        totalAmount: total,
+        currency: 'PHP',
+        status: formData.paymentMethod === 'gcash' ? 'Paid' : 'Pending',
+        deliveryStatus: 'Processing',
+        paymentMethod: formData.paymentMethod,
+        fulfillmentMethod: formData.fulfillmentMethod,
+        riderName: formData.fulfillmentMethod === 'delivery' ? 'To be assigned' : 'Pickup counter',
+        riderContact: '',
+        riderVehicle: formData.fulfillmentMethod === 'delivery' ? '' : 'In-store pickup',
+        eta,
+        trackingUpdates,
+      });
+
+      setConfirmedOrderNumber(savedOrder?.order_number || orderNumber);
+      setOrderComplete(true);
+      clearCart();
+    } catch (error) {
+      alert(error?.message || 'Unable to save your order right now. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (orderComplete) {
@@ -142,7 +219,7 @@ const Checkout = () => {
                 : ' We will prepare your order for delivery based on the selected shipping area.'}
               {formData.paymentMethod === 'gcash' && ' We will verify your payment proof within 24 hours.'}
             </p>
-            <p className="happy-tails-order-number">Order #HT{Math.floor(Math.random() * 1000000)}</p>
+            <p className="happy-tails-order-number">Order #{confirmedOrderNumber || 'N/A'}</p>
             <Button className="happy-tails-back-to-shop" onClick={() => navigate('/shop')}>
               Continue Shopping
             </Button>
@@ -447,9 +524,11 @@ const Checkout = () => {
                   <Button
                     type="submit"
                     className="happy-tails-place-order-btn"
-                    disabled={cart.length === 0 || (formData.paymentMethod === 'gcash' && !proofOfPayment)}
+                    disabled={isSubmitting || cart.length === 0 || (formData.paymentMethod === 'gcash' && !proofOfPayment)}
                   >
-                    {formData.paymentMethod === 'gcash' ? 'Submit Order with Payment Proof' : 'Place Order'}
+                    {isSubmitting
+                      ? 'Processing...'
+                      : (formData.paymentMethod === 'gcash' ? 'Submit Order with Payment Proof' : 'Place Order')}
                   </Button>
 
                   <Button

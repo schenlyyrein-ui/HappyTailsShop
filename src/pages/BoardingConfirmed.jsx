@@ -99,9 +99,10 @@ const BoardingConfirmed = () => {
         petName: firstPet?.name || null,
         petBreed: firstPet?.breed || null,
         petType: firstPet?.type || null,
+        petBirthday: firstPet?.birthday || null,
         date: bookingData.checkInDate,
         time: timeForSchedule,
-        status: 'Confirmed',
+        status: 'Processing',
         priceLabel: `PHP ${Number(bookingData.totalPrice || 0).toFixed(2)}`,
         note: bookingData.serviceType === 'OVERNIGHT' ? '24-hour stay' : '3-hour daycare stay',
         metadata: {

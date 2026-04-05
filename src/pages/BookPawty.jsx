@@ -1,13 +1,49 @@
 // BookPawty.jsx - WITH OWN CONFIRMATION PAGE INSIDE THE COMPONENT
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, ProgressBar, Form, Modal, Alert } from 'react-bootstrap';
 import { useAuth } from '../backend/context/AuthContext';
+import { supabase } from '../backend/supabaseClient';
 import { createProfileBooking } from '../backend/services/profileDataService';
+import gcashQr from '../assets/gcashqr.jpg';
 import './BookPawty.css';
 
 const MAX_PET_PHOTO_SIZE = 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+const normalizePetType = (value) => {
+  const text = String(value || '').toLowerCase();
+  if (text.includes('cat')) return 'Cat';
+  return 'Dog';
+};
+
+const coreSizeToPawtySize = (value) => {
+  const text = String(value || '').trim();
+  if (text === 'Small') return 'Small (1-5 kg)';
+  if (text === 'Medium') return 'Medium (6-10 kg)';
+  if (text === 'Large') return 'Large (11-20 kg)';
+  if (text === 'XL' || text === 'ExtraLarge') return 'Extra Large (21+ kg)';
+  return 'Medium (6-10 kg)';
+};
+
+const pawtySizeToCoreSize = (value) => {
+  const text = String(value || '').toLowerCase();
+  if (text.includes('small')) return 'Small';
+  if (text.includes('medium')) return 'Medium';
+  if (text.includes('large') && !text.includes('extra')) return 'Large';
+  if (text.includes('extra') || text.includes('xl') || text.includes('21+')) return 'ExtraLarge';
+  return 'Medium';
+};
+
+const parsePetNotes = (value) => {
+  if (!value || typeof value !== 'string') return {};
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch (_error) {
+    return {};
+  }
+};
 
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -20,44 +56,13 @@ function readFileAsDataUrl(file) {
 
 const BookPawty = () => {
   const navigate = useNavigate();
-  const { user: authUser } = useAuth();
+  const { user: authUser, profile: authProfile } = useAuth();
   const [activeStep, setActiveStep] = useState(1);
   const steps = ['Select Pet', 'Party Details', 'Payment'];
   
-  const [pets, setPets] = useState([
-    { 
-      id: 1, 
-      name: 'Max', 
-      type: 'Dog', 
-      size: 'Medium (6-10 kg)', 
-      breed: 'Golden Retriever', 
-      age: '3 years',
-      birthday: '',
-      photoDataUrl: null,
-      photoName: '',
-      selected: true,
-      parentName: 'John Doe',
-      parentPhone: '09123456789',
-      parentEmail: 'john@email.com',
-      parentAddress: 'N/A'
-    },
-    { 
-      id: 2, 
-      name: 'Luna', 
-      type: 'Cat', 
-      size: 'Small (1-5 kg)', 
-      breed: 'Siamese', 
-      age: '2 years',
-      birthday: '',
-      photoDataUrl: null,
-      photoName: '',
-      selected: false,
-      parentName: 'Jane Smith',
-      parentPhone: '09123456789',
-      parentEmail: 'jane@email.com',
-      parentAddress: 'N/A'
-    }
-  ]);
+  const [pets, setPets] = useState([]);
+  const [isLoadingPets, setIsLoadingPets] = useState(true);
+  const [petsError, setPetsError] = useState('');
 
   const [serviceType, setServiceType] = useState('');
   const [partyDate, setPartyDate] = useState('');
@@ -82,6 +87,9 @@ const BookPawty = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSavingPet, setIsSavingPet] = useState(false);
+  const [isDeletingPet, setIsDeletingPet] = useState(false);
+  const [modalError, setModalError] = useState('');
   
   const [petForm, setPetForm] = useState({
     name: '',
@@ -138,9 +146,88 @@ const BookPawty = () => {
     { value: 'carrot-pb', label: 'Carrot with Peanut Butter' }
   ];
 
+  const ownerDefaults = useMemo(() => ({
+    parentName: [authProfile?.first_name, authProfile?.last_name].filter(Boolean).join(' ').trim(),
+    parentPhone: authProfile?.phone || '',
+    parentEmail: authUser?.email || '',
+    parentAddress: '',
+  }), [authProfile?.first_name, authProfile?.last_name, authProfile?.phone, authUser?.email]);
+
+  const mapRowToPet = (row) => {
+    const details = parsePetNotes(row.notes);
+    const rowBirthday = row.birth_date ? String(row.birth_date).slice(0, 10) : '';
+
+    return {
+      id: row.id,
+      name: row.name || 'Pet',
+      type: normalizePetType(row.species),
+      size: coreSizeToPawtySize(details.size),
+      breed: row.breed || 'Unknown breed',
+      age: details.age || '',
+      birthday: details.birthday || rowBirthday,
+      photoDataUrl: details.photoDataUrl || null,
+      photoName: details.photoName || '',
+      selected: false,
+      parentName: details.parentName || ownerDefaults.parentName || '',
+      parentPhone: details.parentPhone || ownerDefaults.parentPhone || '',
+      parentEmail: details.parentEmail || ownerDefaults.parentEmail || '',
+      parentAddress: details.parentAddress || ownerDefaults.parentAddress || '',
+    };
+  };
+
+  const serializePetNotes = (form) => JSON.stringify({
+    size: pawtySizeToCoreSize(form.size),
+    age: form.age?.trim() || '',
+    birthday: form.birthday || '',
+    parentName: form.parentName?.trim() || '',
+    parentPhone: form.parentPhone?.trim() || '',
+    parentEmail: form.parentEmail?.trim() || '',
+    parentAddress: form.parentAddress?.trim() || '',
+    photoDataUrl: form.photoDataUrl || null,
+    photoName: form.photoName || '',
+  });
+
+  useEffect(() => {
+    const loadPets = async () => {
+      if (!supabase || !authUser?.id) {
+        setPets([]);
+        setIsLoadingPets(false);
+        return;
+      }
+
+      setIsLoadingPets(true);
+      setPetsError('');
+
+      const { data, error } = await supabase
+        .from('user_pets')
+        .select('id, name, species, breed, birth_date, notes, created_at')
+        .eq('user_id', authUser.id)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        setPets([]);
+        setPetsError(error.message || 'Could not load pets right now.');
+        setIsLoadingPets(false);
+        return;
+      }
+
+      const loadedPets = Array.isArray(data) ? data.map(mapRowToPet) : [];
+      const nextPets = loadedPets.map((pet, index) => ({
+        ...pet,
+        selected: index === 0,
+      }));
+
+      setPets(nextPets);
+      setIsLoadingPets(false);
+    };
+
+    void loadPets();
+  }, [authUser?.id, ownerDefaults]);
+
   const handleAddPet = () => {
     setIsEditing(false);
     setEditingPet(null);
+    setModalError('');
     setPetForm({
       name: '',
       type: 'Dog',
@@ -150,10 +237,10 @@ const BookPawty = () => {
       birthday: '',
       photoDataUrl: null,
       photoName: '',
-      parentName: '',
-      parentPhone: '',
-      parentEmail: '',
-      parentAddress: ''
+      parentName: ownerDefaults.parentName || '',
+      parentPhone: ownerDefaults.parentPhone || '',
+      parentEmail: ownerDefaults.parentEmail || '',
+      parentAddress: ownerDefaults.parentAddress || ''
     });
     setShowModal(true);
   };
@@ -161,6 +248,7 @@ const BookPawty = () => {
   const handleEditPet = (pet) => {
     setIsEditing(true);
     setEditingPet(pet);
+    setModalError('');
     setPetForm({ ...pet });
     setShowModal(true);
   };
@@ -248,29 +336,99 @@ const BookPawty = () => {
     }));
   };
 
-  const handleSavePet = () => {
-    if (isEditing && editingPet) {
-      const updatedPets = pets.map(pet => 
-        pet.id === editingPet.id ? { ...petForm, id: editingPet.id, selected: pet.selected } : pet
-      );
-      setPets(updatedPets);
-    } else {
-      const newPet = {
-        ...petForm,
-        id: pets.length + 1,
-        selected: false
-      };
-      setPets([...pets.map(p => ({ ...p, selected: false })), newPet]);
+  const handleSavePet = async () => {
+    if (!supabase || !authUser?.id) return;
+    if (!petForm.name || !petForm.breed || !petForm.age || !petForm.parentName || !petForm.parentPhone || !petForm.parentEmail) {
+      return;
     }
+
+    setIsSavingPet(true);
+    setModalError('');
+
+    const payload = {
+      user_id: authUser.id,
+      name: petForm.name.trim(),
+      species: normalizePetType(petForm.type).toLowerCase(),
+      breed: petForm.breed.trim(),
+      birth_date: petForm.birthday || null,
+      notes: serializePetNotes(petForm),
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isEditing && editingPet?.id) {
+      const { data, error } = await supabase
+        .from('user_pets')
+        .update(payload)
+        .eq('id', editingPet.id)
+        .eq('user_id', authUser.id)
+        .select('id, name, species, breed, birth_date, notes, created_at')
+        .single();
+
+      if (error) {
+        setModalError(error.message || 'Could not update this pet.');
+        setIsSavingPet(false);
+        return;
+      }
+
+      const updatedPet = mapRowToPet(data);
+      setPets((prev) => prev.map((pet) => (
+        pet.id === editingPet.id
+          ? { ...updatedPet, selected: pet.selected }
+          : pet
+      )));
+      setIsSavingPet(false);
+      setShowModal(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('user_pets')
+      .insert(payload)
+      .select('id, name, species, breed, birth_date, notes, created_at')
+      .single();
+
+    if (error) {
+      setModalError(error.message || 'Could not save this pet.');
+      setIsSavingPet(false);
+      return;
+    }
+
+    const newPet = mapRowToPet(data);
+    setPets((prev) => [
+      ...prev.map((pet) => ({ ...pet, selected: false })),
+      { ...newPet, selected: true },
+    ]);
+    setIsSavingPet(false);
     setShowModal(false);
   };
 
-  const handleDeletePet = () => {
-    if (editingPet && pets.length > 1) {
-      const updatedPets = pets.filter(pet => pet.id !== editingPet.id);
-      setPets(updatedPets);
-      setShowModal(false);
+  const handleDeletePet = async () => {
+    if (!supabase || !authUser?.id || !editingPet?.id) return;
+
+    setIsDeletingPet(true);
+    setModalError('');
+
+    const { error } = await supabase
+      .from('user_pets')
+      .delete()
+      .eq('id', editingPet.id)
+      .eq('user_id', authUser.id);
+
+    if (error) {
+      setModalError(error.message || 'Could not delete this pet.');
+      setIsDeletingPet(false);
+      return;
     }
+
+    setPets((prev) => {
+      const remaining = prev.filter((pet) => pet.id !== editingPet.id);
+      if (remaining.length === 0) return [];
+      if (remaining.some((pet) => pet.selected)) return remaining;
+      return remaining.map((pet, index) => ({ ...pet, selected: index === 0 }));
+    });
+
+    setIsDeletingPet(false);
+    setShowModal(false);
   };
 
   const handleFileChange = (e) => {
@@ -432,9 +590,10 @@ const BookPawty = () => {
         petName: selectedPet.name || null,
         petBreed: selectedPet.breed || null,
         petType: selectedPet.type || null,
+        petBirthday: selectedPet.birthday || null,
         date: partyDate,
         time: partyTime,
-        status: 'Confirmed',
+        status: 'Processing',
         priceLabel: 'PHP 2,000.00',
         note: `Guests: ${guests}; Banner: ${bannerName || 'N/A'}`,
         metadata: {
@@ -466,6 +625,7 @@ const BookPawty = () => {
   };
 
   const handleBack = () => {
+    setModalError('');
     setShowModal(false);
   };
 
@@ -566,52 +726,71 @@ const BookPawty = () => {
                   </Card.Title>
                   
                   <div className="ht-pawty-pets-grid">
-                    {pets.map(pet => (
-                      <div 
-                        key={pet.id} 
-                        className={`ht-pawty-pet-item ${pet.selected ? 'ht-pawty-pet-selected' : ''}`}
-                        onClick={() => handleSelectPet(pet.id)}
-                      >
-                        {pet.photoDataUrl ? (
-                          <img
-                            src={pet.photoDataUrl}
-                            alt={`${pet.name} preview`}
-                            className="ht-pawty-pet-photo"
-                          />
-                        ) : (
-                          <div className={`ht-pawty-pet-avatar ${getPetTypeClass(pet.type)}`}>
-                            {pet.type.charAt(0)}
+                    {isLoadingPets ? (
+                      <div className="ht-pawty-empty-state">
+                        <p className="ht-pawty-empty-text">Loading your pets...</p>
+                      </div>
+                    ) : (
+                      <>
+                        {petsError && (
+                          <Alert variant="danger" className="ht-pawty-alert-error ht-pawty-empty-alert">
+                            {petsError}
+                          </Alert>
+                        )}
+
+                        {pets.map(pet => (
+                          <div 
+                            key={pet.id} 
+                            className={`ht-pawty-pet-item ${pet.selected ? 'ht-pawty-pet-selected' : ''}`}
+                            onClick={() => handleSelectPet(pet.id)}
+                          >
+                            {pet.photoDataUrl ? (
+                              <img
+                                src={pet.photoDataUrl}
+                                alt={`${pet.name} preview`}
+                                className="ht-pawty-pet-photo"
+                              />
+                            ) : (
+                              <div className={`ht-pawty-pet-avatar ${getPetTypeClass(pet.type)}`}>
+                                {pet.type.charAt(0)}
+                              </div>
+                            )}
+                            <div className="ht-pawty-pet-info">
+                              <h5 className="ht-pawty-pet-name">{pet.name}</h5>
+                              <p className="ht-pawty-pet-details">{pet.breed} | {pet.size} | {pet.age}</p>
+                              <p className="ht-pawty-pet-parent">Owner: {pet.parentName}</p>
+                            </div>
+                            {pet.selected && <div className="ht-pawty-pet-checkmark">{"\u2713"}</div>}
+                            <button 
+                              className="ht-pawty-pet-edit-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditPet(pet);
+                              }}
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        ))}
+
+                        {pets.length === 0 && !petsError && (
+                          <div className="ht-pawty-empty-state">
+                            <p className="ht-pawty-empty-text">No pets yet. Add your first pet to continue booking.</p>
                           </div>
                         )}
-                        <div className="ht-pawty-pet-info">
-                          <h5 className="ht-pawty-pet-name">{pet.name}</h5>
-                          <p className="ht-pawty-pet-details">{pet.breed} • {pet.size} • {pet.age}</p>
-                          <p className="ht-pawty-pet-parent">Owner: {pet.parentName}</p>
-                        </div>
-                        {pet.selected && <div className="ht-pawty-pet-checkmark">✓</div>}
-                        <button 
-                          className="ht-pawty-pet-edit-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditPet(pet);
-                          }}
+
+                        <div 
+                          className="ht-pawty-pet-item ht-pawty-add-pet"
+                          onClick={handleAddPet}
                         >
-                          Edit
-                        </button>
-                      </div>
-                    ))}
-                    
-                    <div 
-                      className="ht-pawty-pet-item ht-pawty-add-pet"
-                      onClick={handleAddPet}
-                    >
-                      <div className="ht-pawty-add-pet-icon">+</div>
-                      <div className="ht-pawty-add-pet-text">Add another pet</div>
-                    </div>
+                          <div className="ht-pawty-add-pet-icon">+</div>
+                          <div className="ht-pawty-add-pet-text">{pets.length > 0 ? 'Add another pet' : 'Add your first pet'}</div>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  
                   <div className="ht-pawty-continue-container">
-                    <Button className="ht-pawty-continue-btn" onClick={handleContinue}>
+                    <Button className="ht-pawty-continue-btn" onClick={handleContinue} disabled={isLoadingPets || !selectedPet}>
                       Continue to Party Details
                     </Button>
                   </div>
@@ -1204,6 +1383,19 @@ const BookPawty = () => {
 
                         {paymentMethod === 'gcash' && (
                           <div className="ht-pawty-proof-upload">
+                            <div className="ht-pawty-gcash-section">
+                              <div className="ht-pawty-gcash-qr-card">
+                                <p className="ht-pawty-gcash-qr-title">Scan the GCash QR code first</p>
+                                <img
+                                  src={gcashQr}
+                                  alt="Happy Tails GCash QR code"
+                                  className="ht-pawty-gcash-qr-image"
+                                />
+                                <p className="ht-pawty-gcash-qr-note">
+                                  After sending your payment, upload your proof of payment below.
+                                </p>
+                              </div>
+                            </div>
                             <h6>Upload Proof of Payment *</h6>
                             <div className="ht-pawty-upload-area">
                               <Form.Control
@@ -1365,6 +1557,19 @@ const BookPawty = () => {
               />
             </Form.Group>
 
+            <Form.Group className="mb-4">
+              <Form.Label>Birthday</Form.Label>
+              <Form.Control
+                type="date"
+                name="birthday"
+                value={petForm.birthday}
+                onChange={handleFormChange}
+                className="ht-pawty-form-control"
+              />
+            </Form.Group>
+
+
+
           </div>
 
           <div className="ht-pawty-form-section">
@@ -1423,18 +1628,14 @@ const BookPawty = () => {
               />
             </Form.Group>
 
-            <Form.Group className="mb-4">
-              <Form.Label>Birthday</Form.Label>
-              <Form.Control
-                type="date"
-                name="birthday"
-                value={petForm.birthday}
-                onChange={handleFormChange}
-                className="ht-pawty-form-control"
-              />
-            </Form.Group>
           </div>
           
+          {modalError && (
+            <Alert variant="danger" className="ht-pawty-alert-error">
+              {modalError}
+            </Alert>
+          )}
+
           <div className="ht-pawty-required-note">
             * Required fields
           </div>
@@ -1444,11 +1645,11 @@ const BookPawty = () => {
             {isEditing && (
               <Button 
                 variant="outline-danger" 
-                onClick={handleDeletePet}
+                onClick={() => void handleDeletePet()}
                 className="ht-pawty-delete-btn"
-                disabled={pets.length <= 1}
+                disabled={pets.length <= 1 || isSavingPet || isDeletingPet}
               >
-                Delete Pet
+                {isDeletingPet ? 'Deleting...' : 'Delete Pet'}
               </Button>
             )}
             <div className="ht-pawty-modal-buttons">
@@ -1456,17 +1657,23 @@ const BookPawty = () => {
                 variant="outline-secondary" 
                 onClick={handleBack}
                 className="ht-pawty-back-modal-btn"
+                disabled={isSavingPet || isDeletingPet}
               >
                 Back
               </Button>
               <Button 
                 variant="primary" 
-                onClick={handleSavePet}
+                onClick={() => void handleSavePet()}
                 className="ht-pawty-save-btn"
                 disabled={!petForm.name || !petForm.breed || !petForm.age || 
-                         !petForm.parentName || !petForm.parentPhone || !petForm.parentEmail}
+                         !petForm.parentName || !petForm.parentPhone || !petForm.parentEmail ||
+                         isSavingPet || isDeletingPet}
               >
-                {isEditing ? 'Update Pet Info' : 'Save Pet Info'}
+                {isSavingPet ? (
+                  isEditing ? 'Updating...' : 'Saving...'
+                ) : (
+                  isEditing ? 'Update Pet Info' : 'Save Pet Info'
+                )}
               </Button>
             </div>
           </div>

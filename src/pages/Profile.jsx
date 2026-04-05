@@ -4,6 +4,7 @@ import SidebarProfile from '../components/SidebarProfile';
 import { useAuth } from '../backend/context/AuthContext';
 import {
   cancelProfileBooking,
+  cancelProfileOrder,
   deleteProfileReview,
   fetchProfileDashboard,
   markAllNotificationsAsRead,
@@ -156,7 +157,7 @@ const Profile = () => {
       petBreed: 'Golden Retriever',
       date: 'Dec 20, 2024',
       time: '10:00 AM',
-      status: 'Confirmed',
+      status: 'Processing',
       price: '₱850 - ₱1,200',
       note: '*Price may vary depending on pet size/condition'
     },
@@ -168,7 +169,7 @@ const Profile = () => {
       petBreed: 'Shih Tzu',
       date: 'Dec 22, 2024',
       time: '9:00 AM',
-      status: 'Confirmed',
+      status: 'Processing',
       price: '₱500/night',
       note: '* Price may vary depending on pet size/condition'
     },
@@ -180,7 +181,7 @@ const Profile = () => {
       petBreed: 'Persian Cat',
       date: 'Dec 25, 2024',
       time: '2:00 PM',
-      status: 'Confirmed',
+      status: 'Processing',
       price: '₱299 entry',
       note: '* Price may vary depending on pet size/condition'
     }
@@ -627,6 +628,79 @@ const Profile = () => {
     navigate('/checkout', { state: { items: order.items } });
   };
 
+  const handleCancelOrder = async (order) => {
+    if (!order) return;
+    if (order.deliveryStatus === 'Completed' || order.deliveryStatus === 'Cancelled') return;
+
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
+      return;
+    }
+
+    const cancelledAt = new Date().toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+    const cancelReason = 'Cancelled by customer';
+    const cancelledStage = 'Preparing Order';
+
+    if (authUser?.id) {
+      try {
+        await cancelProfileOrder(authUser.id, order.dbId || order.id, {
+          cancelledAt: new Date().toISOString(),
+          cancelledStage,
+          cancelReason,
+          status: 'Cancelled',
+        });
+      } catch (error) {
+        alert(error?.message || 'Unable to cancel order right now.');
+        return;
+      }
+    }
+
+    setOrderHistory((prev) =>
+      prev.map((entry) => {
+        if (entry.id !== order.id) return entry;
+
+        const existingUpdates = Array.isArray(entry.trackingUpdates) ? entry.trackingUpdates : [];
+        const hasCancelledStep = existingUpdates.some(
+          (log) => String(log?.title || '').toLowerCase() === 'cancelled'
+        );
+        const trackingUpdates = hasCancelledStep
+          ? existingUpdates
+          : [
+              ...existingUpdates,
+              {
+                time: cancelledAt,
+                title: 'Cancelled',
+                details: cancelReason,
+              },
+            ];
+
+        return {
+          ...entry,
+          status: 'Cancelled',
+          deliveryStatus: 'Cancelled',
+          cancelledAt,
+          cancelledStage,
+          cancelReason,
+          eta: '',
+          updatedAt: cancelledAt,
+          trackingUpdates,
+        };
+      })
+    );
+
+    setExpandedTracking((prev) => ({
+      ...prev,
+      [order.id]: true,
+    }));
+
+    alert('Order cancelled successfully!');
+  };
+
   const handleViewServiceDetails = (booking) => {
     switch(booking.serviceType) {
       case 'grooming':
@@ -676,6 +750,25 @@ const Profile = () => {
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  const normalizeBookingStatus = (status) => {
+    const raw = String(status || '').trim();
+    const normalized = raw.toLowerCase();
+
+    if (!normalized || normalized === 'pending' || normalized === 'in process' || normalized === 'in-process') {
+      return 'Processing';
+    }
+    if (normalized === 'completed') return 'Completed';
+    if (normalized === 'cancelled' || normalized === 'canceled') return 'Cancelled';
+    if (normalized === 'out for delivery') return 'Out for Delivery';
+    if (normalized === 'confirmed') return 'Confirmed';
+    return raw || 'Processing';
+  };
+
+  const getBookingStatusClass = (status) =>
+    normalizeBookingStatus(status).toLowerCase().replace(/\s+/g, '-');
+
+  const getBookingStatusLabel = (status) => normalizeBookingStatus(status);
 
   const baseOrderTimeline = ['Order Placed', 'Payment Confirmed', 'Preparing Order', 'Out for Delivery', 'Completed'];
 
@@ -1007,7 +1100,9 @@ const Profile = () => {
                 <div className="preview-title">{booking.service}</div>
                 <div className="preview-subtitle">{booking.petName} · {booking.date}</div>
               </div>
-              <span className="status confirmed">{booking.status}</span>
+              <span className={`status ${getBookingStatusClass(booking.status)}`}>
+                {getBookingStatusLabel(booking.status)}
+              </span>
             </div>
           ))}
         </div>
@@ -1056,7 +1151,9 @@ const Profile = () => {
                                 <span className="pet-breed">{booking.petBreed}</span>
                               </div>
                             </div>
-                            <span className="status-badge confirmed">{booking.status}</span>
+                            <span className={`status-badge ${getBookingStatusClass(booking.status)}`}>
+                              {getBookingStatusLabel(booking.status)}
+                            </span>
                           </div>
                           
                           <div className="booking-datetime">
@@ -1193,6 +1290,8 @@ const Profile = () => {
                         const { timeline, currentStepIndex } = getTrackingConfig(order);
                         const isCompleted = order.deliveryStatus === 'Completed';
                         const isCancelled = order.deliveryStatus === 'Cancelled';
+                        const paymentLabel = order.paymentMethod || (order.status === 'Paid' ? 'GCash' : 'Cash');
+                        const fulfillmentLabel = order.fulfillmentMethod || (String(order.riderName || '').toLowerCase().includes('pickup') ? 'Pickup' : 'Delivery');
                         const showTracking = !!expandedTracking[order.id];
                         const latestTrackingUpdate = (order.trackingUpdates && order.trackingUpdates.length > 0)
                           ? order.trackingUpdates[order.trackingUpdates.length - 1]
@@ -1212,6 +1311,8 @@ const Profile = () => {
                           </div>
 
                           <div className="order-meta-row">
+                            <span><strong>Fulfillment:</strong> {fulfillmentLabel}</span>
+                            <span><strong>Payment:</strong> {paymentLabel}</span>
                             <span><strong>Rider:</strong> {order.riderName}</span>
                             <span><strong>Last update:</strong> {order.updatedAt}</span>
                             {isCompleted && order.deliveredAt && (
@@ -1307,6 +1408,11 @@ const Profile = () => {
                             <button className="btn-outline" onClick={() => toggleTracking(order.id)}>
                               {showTracking ? 'Hide Tracking' : 'View Tracking'}
                             </button>
+                            {!isCompleted && !isCancelled && (
+                              <button className="btn-outline" onClick={() => handleCancelOrder(order)}>
+                                Cancel
+                              </button>
+                            )}
                             <button className="btn-secondary" onClick={() => handleReorder(order)}>
                               Reorder
                             </button>

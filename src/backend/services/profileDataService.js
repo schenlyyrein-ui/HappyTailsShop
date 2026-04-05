@@ -79,6 +79,40 @@ function toReviewDate(value) {
   return parsed.toISOString().slice(0, 10);
 }
 
+function normalizePaymentMethod(value, status) {
+  const text = String(value || "").toLowerCase();
+  if (text.includes("gcash")) return "GCash";
+  if (text.includes("cash")) return "Cash";
+
+  const normalizedStatus = String(status || "").toLowerCase();
+  if (normalizedStatus === "paid") return "GCash";
+  if (normalizedStatus === "pending") return "Cash";
+  return "";
+}
+
+function normalizeFulfillmentMethod(value, riderName) {
+  const text = String(value || "").toLowerCase();
+  if (text.includes("pickup")) return "Pickup";
+  if (text.includes("delivery")) return "Delivery";
+
+  const riderText = String(riderName || "").toLowerCase();
+  if (riderText.includes("pickup")) return "Pickup";
+  if (riderText.includes("rider")) return "Delivery";
+  return "";
+}
+
+function normalizeBookingStatus(value) {
+  const text = String(value || "").trim().toLowerCase();
+  if (!text || text === "pending" || text === "in process" || text === "in-process") {
+    return "Processing";
+  }
+  if (text === "completed") return "Completed";
+  if (text === "cancelled" || text === "canceled") return "Cancelled";
+  if (text === "out for delivery") return "Out for Delivery";
+  if (text === "confirmed") return "Confirmed";
+  return String(value || "").trim() || "Processing";
+}
+
 function mapReviewRowToUi(row) {
   return {
     id: row.id,
@@ -223,6 +257,54 @@ async function loadProfileDetails(userId) {
   };
 }
 
+async function loadOrderRows(userId) {
+  const selectWithMethods =
+    "id, order_number, ordered_at, items, total_amount, currency, status, delivery_status, payment_method, fulfillment_method, rider_name, rider_contact, rider_vehicle, updated_at, delivered_at, eta, cancelled_at, cancelled_stage, cancel_reason, tracking_updates";
+  const selectFallback =
+    "id, order_number, ordered_at, items, total_amount, currency, status, delivery_status, rider_name, rider_contact, rider_vehicle, updated_at, delivered_at, eta, cancelled_at, cancelled_stage, cancel_reason, tracking_updates";
+
+  const primary = await supabase
+    .from("profile_orders")
+    .select(selectWithMethods)
+    .eq("user_id", userId)
+    .order("ordered_at", { ascending: false });
+
+  if (!primary.error) {
+    return {
+      rows: Array.isArray(primary.data) ? primary.data : [],
+      schemaMissing: false,
+    };
+  }
+
+  if (!isSchemaError(primary.error)) {
+    throw new Error(primary.error.message);
+  }
+
+  const fallback = await supabase
+    .from("profile_orders")
+    .select(selectFallback)
+    .eq("user_id", userId)
+    .order("ordered_at", { ascending: false });
+
+  if (fallback.error) {
+    if (isSchemaError(fallback.error)) return { rows: [], schemaMissing: true };
+    throw new Error(fallback.error.message);
+  }
+
+  const rows = Array.isArray(fallback.data)
+    ? fallback.data.map((row) => ({
+        ...row,
+        payment_method: null,
+        fulfillment_method: null,
+      }))
+    : [];
+
+  return {
+    rows,
+    schemaMissing: true,
+  };
+}
+
 export async function fetchProfileDashboard(userId) {
   if (!supabase || !userId) return null;
 
@@ -230,7 +312,7 @@ export async function fetchProfileDashboard(userId) {
   const petsResult = await safeSelectRows(
     supabase
       .from("user_pets")
-      .select("id, name, species, breed")
+      .select("id, name, species, breed, birth_date")
       .eq("user_id", userId)
       .order("created_at", { ascending: true })
   );
@@ -254,15 +336,7 @@ export async function fetchProfileDashboard(userId) {
       .order("scheduled_at", { ascending: false })
   );
 
-  const ordersResult = await safeSelectRows(
-    supabase
-      .from("profile_orders")
-      .select(
-        "id, order_number, ordered_at, items, total_amount, currency, status, delivery_status, rider_name, rider_contact, rider_vehicle, updated_at, delivered_at, eta, cancelled_at, cancelled_stage, cancel_reason, tracking_updates"
-      )
-      .eq("user_id", userId)
-      .order("ordered_at", { ascending: false })
-  );
+  const ordersResult = await loadOrderRows(userId);
 
   const reviewsResult = await safeSelectRows(
     supabase
@@ -280,7 +354,7 @@ export async function fetchProfileDashboard(userId) {
     petBreed: row.pet_breed || "",
     date: formatDate(row.scheduled_at),
     time: formatTime(row.scheduled_at),
-    status: row.status || "Pending",
+    status: normalizeBookingStatus(row.status),
     price: row.price_label || "",
     note: row.note || "",
     reviewed: Boolean(row.reviewed),
@@ -310,12 +384,16 @@ export async function fetchProfileDashboard(userId) {
   }
 
   const orders = ordersResult.rows.map((row) => ({
+    dbId: row.id,
     id: row.order_number || row.id,
+    orderNumber: row.order_number || row.id,
     date: formatDate(row.ordered_at),
     items: Array.isArray(row.items) ? row.items : [],
     total: formatCurrency(row.total_amount, row.currency || "PHP"),
     status: row.status || "Pending",
     deliveryStatus: row.delivery_status || "Processing",
+    paymentMethod: normalizePaymentMethod(row.payment_method, row.status),
+    fulfillmentMethod: normalizeFulfillmentMethod(row.fulfillment_method, row.rider_name),
     riderName: row.rider_name || "Not assigned",
     riderContact: row.rider_contact || "",
     riderVehicle: row.rider_vehicle || "",
@@ -346,6 +424,7 @@ export async function fetchProfileDashboard(userId) {
   const pets = petsResult.rows.map((row) => ({
     name: row.name || "Pet",
     type: row.breed || row.species || "Pet",
+    birthday: row.birth_date ? String(row.birth_date).slice(0, 10) : "",
   }));
 
   const schemaReady =
@@ -404,7 +483,7 @@ export async function createProfileBooking(userId, payload) {
     pet_name: payload.petName || null,
     pet_breed: payload.petBreed || null,
     scheduled_at: scheduledAt,
-    status: payload.status || "Confirmed",
+    status: payload.status || "Processing",
     price_label: payload.priceLabel || null,
     note: payload.note || null,
     reviewed: Boolean(payload.reviewed || false),
@@ -422,18 +501,21 @@ export async function createProfileBooking(userId, payload) {
 
   // Keep user pet tags in profile aligned with booking activity.
   if (payload.petName) {
-    await supabase.from("user_pets").upsert(
-      {
-        user_id: userId,
-        name: payload.petName,
-        species: normalizeSpecies(payload.petType),
-        breed: payload.petBreed || null,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: "user_id,name",
-      }
-    );
+    const petRow = {
+      user_id: userId,
+      name: payload.petName,
+      species: normalizeSpecies(payload.petType),
+      breed: payload.petBreed || null,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (payload.petBirthday) {
+      petRow.birth_date = payload.petBirthday;
+    }
+
+    await supabase.from("user_pets").upsert(petRow, {
+      onConflict: "user_id,name",
+    });
   }
 
   return data;
@@ -444,15 +526,20 @@ export async function createProfileOrder(userId, payload) {
   if (!userId) throw new Error("You must be logged in to create an order.");
 
   const items = Array.isArray(payload.items) ? payload.items : [];
+  const orderNumber = payload.orderNumber
+    || `ORD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+
   const orderRow = {
     user_id: userId,
-    order_number: payload.orderNumber,
+    order_number: orderNumber,
     ordered_at: payload.orderedAt || new Date().toISOString(),
     items,
     total_amount: Number(payload.totalAmount || 0),
     currency: payload.currency || "PHP",
     status: payload.status || "Paid",
     delivery_status: payload.deliveryStatus || "Processing",
+    payment_method: payload.paymentMethod || null,
+    fulfillment_method: payload.fulfillmentMethod || null,
     rider_name: payload.riderName || null,
     rider_contact: payload.riderContact || null,
     rider_vehicle: payload.riderVehicle || null,
@@ -465,14 +552,72 @@ export async function createProfileOrder(userId, payload) {
     updated_at: new Date().toISOString(),
   };
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("profile_orders")
     .insert(orderRow)
     .select("id, order_number")
     .single();
 
+  if (error && isSchemaError(error)) {
+    const legacyOrderRow = {
+      ...orderRow,
+    };
+    delete legacyOrderRow.payment_method;
+    delete legacyOrderRow.fulfillment_method;
+
+    const retry = await supabase
+      .from("profile_orders")
+      .insert(legacyOrderRow)
+      .select("id, order_number")
+      .single();
+
+    data = retry.data;
+    error = retry.error;
+  }
+
   if (error) throw new Error(error.message);
   return data;
+}
+
+export async function cancelProfileOrder(userId, orderId, payload = {}) {
+  if (!supabase || !userId || !orderId) return false;
+
+  const nowIso = new Date().toISOString();
+  const updateRow = {
+    status: payload.status || "Cancelled",
+    delivery_status: "Cancelled",
+    cancelled_at: payload.cancelledAt || nowIso,
+    cancelled_stage: payload.cancelledStage || "Preparing Order",
+    cancel_reason: payload.cancelReason || "Cancelled by customer",
+    eta: null,
+    updated_at: nowIso,
+  };
+
+  const byId = await supabase
+    .from("profile_orders")
+    .update(updateRow)
+    .eq("user_id", userId)
+    .eq("id", orderId)
+    .select("id")
+    .maybeSingle();
+
+  if (!byId.error && byId.data?.id) return true;
+  if (byId.error && !isSchemaError(byId.error)) throw new Error(byId.error.message);
+
+  const byOrderNumber = await supabase
+    .from("profile_orders")
+    .update(updateRow)
+    .eq("user_id", userId)
+    .eq("order_number", orderId)
+    .select("id")
+    .maybeSingle();
+
+  if (byOrderNumber.error) {
+    if (isSchemaError(byOrderNumber.error)) return false;
+    throw new Error(byOrderNumber.error.message);
+  }
+
+  return Boolean(byOrderNumber.data?.id);
 }
 
 export async function markNotificationAsRead(userId, notificationId) {

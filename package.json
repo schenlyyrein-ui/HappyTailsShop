@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "db:inspect": "node scripts/inspect-db.mjs",
-    "db:migrate:profile": "node scripts/run-sql-file.mjs database/migrations/20260320_profile_backend.sql"
+    "db:migrate:profile": "node scripts/run-sql-file.mjs database/migrations/20260320_profile_backend.sql",
+    "db:migrate:order-methods": "node scripts/run-sql-file.mjs database/migrations/20260405_profile_orders_methods.sql"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",
